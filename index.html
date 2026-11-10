@@ -112,7 +112,7 @@
         </div>
 
         <!-- ═══ FORM LOGIN (US-02 — Login Pengguna) · Aktor: semua aktor ═══ -->
-        <form id="form-login" onsubmit="event.preventDefault(); closeAuth();" class="glass-card rounded-3xl p-6 sm:p-8 shadow-xl space-y-4">
+        <form id="form-login" onsubmit="handleLogin(event)" class="glass-card rounded-3xl p-6 sm:p-8 shadow-xl space-y-4">
           <div class="flex items-center justify-between">
             <div>
               <div class="flex items-center gap-2"><span class="us-chip">US-02</span><span class="actor-badge actor-nasabah">Aktor: Semua</span></div>
@@ -132,6 +132,7 @@
               <button type="button" onclick="const p=document.getElementById('login-password');p.type=p.type==='password'?'text':'password';" class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-700" aria-label="Tampilkan password"><i class="fa-regular fa-eye"></i></button>
             </div>
           </div>
+          <p id="login-error" class="hidden text-[11px] font-bold text-red-600 bg-red-50 border border-red-200 rounded-xl px-3 py-2"><i class="fa-solid fa-circle-exclamation"></i> <span id="login-error-text"></span></p>
           <button type="submit" class="btn btn-primary w-full justify-center !py-3 text-sm"><i class="fa-solid fa-lock"></i> Masuk (Simulasi)</button>
           <div class="text-[11px] text-slate-500 bg-slate-50 border border-slate-200 rounded-xl p-3">
             <p class="font-extrabold text-slate-600 mb-1.5 flex items-center gap-1.5"><span class="dummy-badge">Data Dummy</span> Contoh akun uji (password: <code>password123</code>)</p>
@@ -140,6 +141,7 @@
                 <tr class="border-b border-slate-200"><td class="py-1 font-mono">admin_ketua</td><td>Ketua</td></tr>
                 <tr class="border-b border-slate-200"><td class="py-1 font-mono">petugas_timbang1</td><td>Petugas Timbang</td></tr>
                 <tr class="border-b border-slate-200"><td class="py-1 font-mono">bendahara</td><td>Bendahara</td></tr>
+                <tr><td class="py-1 font-mono">petugas_timbang2</td><td>Petugas Timbang 2</td></tr>
                 <tr><td class="py-1 font-mono">nasabah_a</td><td>Nasabah (BS-000012)</td></tr>
               </tbody>
             </table>
@@ -223,7 +225,7 @@
 
       <!-- Menu -->
       <nav class="px-3 py-3 space-y-1 overflow-y-auto text-xs font-medium flex-1">
-        <button onclick="switchTab('dashboard')" class="nav-item active w-full flex items-center space-x-3 px-3.5 py-2.5 rounded-xl text-left transition-all text-slate-300 hover:bg-slate-800/80 hover:text-white" data-tab="dashboard">
+        <button onclick="switchTab('dashboard')" class="nav-item active w-full flex items-center space-x-3 px-3.5 py-2.5 rounded-xl text-left transition-all text-slate-300 hover:bg-slate-800/80 hover:text-white" data-tab="dashboard" data-roles="ketua">
           <div class="w-7 h-7 rounded-lg bg-slate-800/80 flex items-center justify-center text-emerald-400 shrink-0"><i class="fa-solid fa-chart-pie text-sm"></i></div>
           <div class="flex-1"><div class="font-bold text-[13px] text-white">Dashboard Pengawasan</div><div class="text-[9px] text-slate-400">Ringkasan untuk Ketua</div></div>
         </button>
@@ -236,44 +238,44 @@
           <span class="us-chip">US-01</span><span>Registrasi Akun Nasabah</span>
         </button>
 
-        <div class="pt-3 pb-1 px-2 flex items-center justify-between text-[9px] font-extrabold uppercase tracking-widest text-emerald-500"><span>Nasabah</span><span class="bg-emerald-900/60 text-emerald-300 px-1.5 py-0.5 rounded text-[8px]">1 US</span></div>
-        <button onclick="switchTab('us06')" class="nav-item w-full flex items-center space-x-3 px-3.5 py-2 rounded-xl text-left text-slate-300 hover:bg-slate-800/80" data-tab="us06">
+        <div class="pt-3 pb-1 px-2 flex items-center justify-between text-[9px] font-extrabold uppercase tracking-widest text-emerald-500" data-roles="nasabah bendahara ketua"><span>Nasabah</span><span class="bg-emerald-900/60 text-emerald-300 px-1.5 py-0.5 rounded text-[8px]">1 US</span></div>
+        <button onclick="switchTab('us06')" class="nav-item w-full flex items-center space-x-3 px-3.5 py-2 rounded-xl text-left text-slate-300 hover:bg-slate-800/80" data-tab="us06" data-roles="nasabah bendahara ketua">
           <span class="us-chip">US-06</span><span>Saldo &amp; Riwayat Saya</span>
         </button>
 
-        <div class="pt-3 pb-1 px-2 flex items-center justify-between text-[9px] font-extrabold uppercase tracking-widest text-blue-400"><span>Petugas Timbang</span><span class="bg-blue-900/60 text-blue-300 px-1.5 py-0.5 rounded text-[8px]">2 US</span></div>
-        <button onclick="switchTab('us04')" class="nav-item w-full flex items-center space-x-3 px-3.5 py-2 rounded-xl text-left text-slate-300 hover:bg-slate-800/80" data-tab="us04">
+        <div class="pt-3 pb-1 px-2 flex items-center justify-between text-[9px] font-extrabold uppercase tracking-widest text-blue-400" data-roles="petugas ketua"><span>Petugas Timbang</span><span class="bg-blue-900/60 text-blue-300 px-1.5 py-0.5 rounded text-[8px]">2 US</span></div>
+        <button onclick="switchTab('us04')" class="nav-item w-full flex items-center space-x-3 px-3.5 py-2 rounded-xl text-left text-slate-300 hover:bg-slate-800/80" data-tab="us04" data-roles="petugas ketua">
           <span class="us-chip">US-04</span><span>Catat Setoran Sampah</span>
         </button>
-        <button onclick="switchTab('us09')" class="nav-item w-full flex items-center space-x-3 px-3.5 py-2 rounded-xl text-left text-slate-300 hover:bg-slate-800/80" data-tab="us09">
+        <button onclick="switchTab('us09')" class="nav-item w-full flex items-center space-x-3 px-3.5 py-2 rounded-xl text-left text-slate-300 hover:bg-slate-800/80" data-tab="us09" data-roles="petugas ketua">
           <span class="us-chip">US-09</span><span>Penimbangan Ulang &amp; Penyusutan</span>
         </button>
 
-        <div class="pt-3 pb-1 px-2 flex items-center justify-between text-[9px] font-extrabold uppercase tracking-widest text-amber-400"><span>Bendahara</span><span class="bg-amber-900/60 text-amber-300 px-1.5 py-0.5 rounded text-[8px]">2 US</span></div>
-        <button onclick="switchTab('us07')" class="nav-item w-full flex items-center space-x-3 px-3.5 py-2 rounded-xl text-left text-slate-300 hover:bg-slate-800/80" data-tab="us07">
+        <div class="pt-3 pb-1 px-2 flex items-center justify-between text-[9px] font-extrabold uppercase tracking-widest text-amber-400" data-roles="bendahara ketua"><span>Bendahara</span><span class="bg-amber-900/60 text-amber-300 px-1.5 py-0.5 rounded text-[8px]">2 US</span></div>
+        <button onclick="switchTab('us07')" class="nav-item w-full flex items-center space-x-3 px-3.5 py-2 rounded-xl text-left text-slate-300 hover:bg-slate-800/80" data-tab="us07" data-roles="bendahara ketua">
           <span class="us-chip">US-07</span><span>Catat Penarikan Tabungan</span>
         </button>
-        <button onclick="switchTab('us11')" class="nav-item w-full flex items-center space-x-3 px-3.5 py-2 rounded-xl text-left text-slate-300 hover:bg-slate-800/80" data-tab="us11">
+        <button onclick="switchTab('us11')" class="nav-item w-full flex items-center space-x-3 px-3.5 py-2 rounded-xl text-left text-slate-300 hover:bg-slate-800/80" data-tab="us11" data-roles="bendahara ketua">
           <span class="us-chip">US-11</span><span>Catat Kas Operasional</span>
         </button>
 
-        <div class="pt-3 pb-1 px-2 flex items-center justify-between text-[9px] font-extrabold uppercase tracking-widest text-purple-400"><span>Ketua</span><span class="bg-purple-900/60 text-purple-300 px-1.5 py-0.5 rounded text-[8px]">6 US</span></div>
-        <button onclick="switchTab('us03')" class="nav-item w-full flex items-center space-x-3 px-3.5 py-2 rounded-xl text-left text-slate-300 hover:bg-slate-800/80" data-tab="us03">
+        <div class="pt-3 pb-1 px-2 flex items-center justify-between text-[9px] font-extrabold uppercase tracking-widest text-purple-400" data-roles="ketua"><span>Ketua</span><span class="bg-purple-900/60 text-purple-300 px-1.5 py-0.5 rounded text-[8px]">6 US</span></div>
+        <button onclick="switchTab('us03')" class="nav-item w-full flex items-center space-x-3 px-3.5 py-2 rounded-xl text-left text-slate-300 hover:bg-slate-800/80" data-tab="us03" data-roles="ketua">
           <span class="us-chip">US-03</span><span>Penetapan Peran Pengurus</span>
         </button>
-        <button onclick="switchTab('us05')" class="nav-item w-full flex items-center space-x-3 px-3.5 py-2 rounded-xl text-left text-slate-300 hover:bg-slate-800/80" data-tab="us05">
+        <button onclick="switchTab('us05')" class="nav-item w-full flex items-center space-x-3 px-3.5 py-2 rounded-xl text-left text-slate-300 hover:bg-slate-800/80" data-tab="us05" data-roles="ketua">
           <span class="us-chip">US-05</span><span>Mengatur Harga Sampah</span>
         </button>
-        <button onclick="switchTab('us08')" class="nav-item w-full flex items-center space-x-3 px-3.5 py-2 rounded-xl text-left text-slate-300 hover:bg-slate-800/80" data-tab="us08">
+        <button onclick="switchTab('us08')" class="nav-item w-full flex items-center space-x-3 px-3.5 py-2 rounded-xl text-left text-slate-300 hover:bg-slate-800/80" data-tab="us08" data-roles="ketua">
           <span class="us-chip">US-08</span><span>Lihat Stok Sampah</span>
         </button>
-        <button onclick="switchTab('us10')" class="nav-item w-full flex items-center space-x-3 px-3.5 py-2 rounded-xl text-left text-slate-300 hover:bg-slate-800/80" data-tab="us10">
+        <button onclick="switchTab('us10')" class="nav-item w-full flex items-center space-x-3 px-3.5 py-2 rounded-xl text-left text-slate-300 hover:bg-slate-800/80" data-tab="us10" data-roles="ketua">
           <span class="us-chip">US-10</span><span>Catat Penjualan ke Pengepul</span>
         </button>
-        <button onclick="switchTab('us12')" class="nav-item w-full flex items-center space-x-3 px-3.5 py-2 rounded-xl text-left text-slate-300 hover:bg-slate-800/80" data-tab="us12">
+        <button onclick="switchTab('us12')" class="nav-item w-full flex items-center space-x-3 px-3.5 py-2 rounded-xl text-left text-slate-300 hover:bg-slate-800/80" data-tab="us12" data-roles="ketua">
           <span class="us-chip">US-12</span><span>Koreksi Transaksi</span>
         </button>
-        <button onclick="switchTab('us13')" class="nav-item w-full flex items-center space-x-3 px-3.5 py-2 rounded-xl text-left text-slate-300 hover:bg-slate-800/80" data-tab="us13">
+        <button onclick="switchTab('us13')" class="nav-item w-full flex items-center space-x-3 px-3.5 py-2 rounded-xl text-left text-slate-300 hover:bg-slate-800/80" data-tab="us13" data-roles="ketua">
           <span class="us-chip">US-13</span><span>Lihat Laporan</span>
         </button>
       </nav>
@@ -282,10 +284,10 @@
     <!-- Profil dummy + logout -->
     <div class="p-4 border-t border-slate-800/90 flex items-center justify-between">
       <div class="flex items-center space-x-3">
-        <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-emerald-500 to-teal-400 flex items-center justify-center font-bold text-white text-xs">IM</div>
+        <div id="sidebar-avatar" class="w-9 h-9 rounded-xl bg-gradient-to-tr from-emerald-500 to-teal-400 flex items-center justify-center font-bold text-white text-xs">IM</div>
         <div>
-          <div class="text-[11px] font-bold text-white leading-tight">Ketua Bank Sampah (DUMMY)</div>
-          <div class="text-[9px] text-emerald-400">Ketua Bank Sampah</div>
+          <div class="text-[11px] font-bold text-white leading-tight"><span id="sidebar-name">Ketua Bank Sampah (DUMMY)</span></div>
+          <div class="text-[9px] text-emerald-400"><span id="sidebar-role">Ketua Bank Sampah</span></div>
         </div>
       </div>
       <button title="Keluar (kembali ke layar login)" onclick="openAuth('login')" class="text-slate-400 hover:text-white p-2 rounded-xl hover:bg-slate-800 transition"><i class="fa-solid fa-right-from-bracket text-xs"></i></button>
@@ -473,10 +475,10 @@
             <table class="tbl">
               <thead><tr><th>Jenis</th><th>Periode Mulai</th><th>Periode Berakhir</th><th class="text-right">Harga/kg</th><th>Ditetapkan oleh</th></tr></thead>
               <tbody>
-                <tr><td>Botol Plastik</td><td>2026-11-01</td><td><span class="pill pill-ok">Masih berlaku</span></td><td class="text-right font-mono">2.500</td><td>Ketua</td></tr>
-                <tr><td>Botol Plastik</td><td>2026-10-01</td><td>2026-10-31</td><td class="text-right font-mono">2.300</td><td>Ketua</td></tr>
-                <tr><td>Kardus</td><td>2026-11-01</td><td><span class="pill pill-ok">Masih berlaku</span></td><td class="text-right font-mono">1.500</td><td>Ketua</td></tr>
-                <tr><td>Besi</td><td>2026-11-01</td><td><span class="pill pill-ok">Masih berlaku</span></td><td class="text-right font-mono">5.000</td><td>Ketua</td></tr>
+                <tr><td>Botol Plastik</td><td>2026-11-01</td><td><span class="pill pill-ok">Masih berlaku</span></td><td class="text-right font-mono">2.500</td><td>Ketua (Ketua Bank Sampah)</td></tr>
+                <tr><td>Botol Plastik</td><td>2026-10-01</td><td>2026-10-31</td><td class="text-right font-mono">2.300</td><td>Ketua (Ketua Bank Sampah)</td></tr>
+                <tr><td>Kardus</td><td>2026-11-01</td><td><span class="pill pill-ok">Masih berlaku</span></td><td class="text-right font-mono">1.500</td><td>Ketua (Ketua Bank Sampah)</td></tr>
+                <tr><td>Besi</td><td>2026-11-01</td><td><span class="pill pill-ok">Masih berlaku</span></td><td class="text-right font-mono">5.000</td><td>Ketua (Ketua Bank Sampah)</td></tr>
               </tbody>
             </table>
           </div>
@@ -561,7 +563,7 @@
             </div>
             <div>
               <label class="lbl" for="us07-bendahara">Bendahara Pemroses</label>
-              <input class="input bg-slate-100" readonly value="Bendahara — DUMMY">
+              <input class="input bg-slate-100" readonly value="Bendahara (Bendahara) — DUMMY">
             </div>
             <label class="flex items-start gap-2 text-[11px] text-slate-600 bg-amber-50 border border-amber-200 rounded-xl p-3 cursor-pointer">
               <input type="checkbox" class="mt-0.5" required>
@@ -677,7 +679,7 @@
                 <input id="us11-ket" class="input" list="us11-presets" required placeholder="mis. Pembelian karung">
                 <datalist id="us11-presets"><option value="Pembelian karung"></option><option value="Biaya transportasi pengepul"></option><option value="Porsi 10% dari setoran (otomatis)"></option><option value="Konsumsi rapat pengurus"></option></datalist>
               </div>
-              <div><label class="lbl" for="us11-petugas">Pencatat</label><input class="input bg-slate-100" readonly value="Bendahara — DUMMY"></div>
+              <div><label class="lbl" for="us11-petugas">Pencatat</label><input class="input bg-slate-100" readonly value="Bendahara (Bendahara) — DUMMY"></div>
               <div><label class="lbl" for="us11-ref">Referensi Transaksi (opsional)</label><input id="us11-ref" class="input font-mono" placeholder="mis. SET-202611-00042"></div>
               <div class="flex justify-end gap-2"><button type="reset" class="btn btn-slate">Batal</button><button type="submit" class="btn btn-amber"><i class="fa-solid fa-floppy-disk"></i> Simpan Kas (Simulasi)</button></div>
             </form>
@@ -748,7 +750,7 @@
               <thead><tr><th>Waktu</th><th>Pengguna</th><th>Tabel / Ref.</th><th>Aksi</th><th>Alasan</th></tr></thead>
               <tbody>
                 <tr><td class="text-slate-500">2026-10-31 09:12</td><td>Ketua Bank Sampah (Ketua)</td><td class="font-mono text-[10px]">transaksi_setor / SET-202610-00018</td><td><span class="pill pill-warn">KOREKSI</span></td><td>Salah input berat kardus: 20,0 → 18,0 kg</td></tr>
-                <tr><td class="text-slate-500">2026-10-25 08:47</td><td>Bendahara</td><td class="font-mono text-[10px]">kas_operasional / KAS-202610-00009</td><td><span class="pill pill-warn">KOREKSI</span></td><td>Keterangan pengeluaran kurang lengkap</td></tr>
+                <tr><td class="text-slate-500">2026-10-25 08:47</td><td>Bendahara (Bendahara)</td><td class="font-mono text-[10px]">kas_operasional / KAS-202610-00009</td><td><span class="pill pill-warn">KOREKSI</span></td><td>Keterangan pengeluaran kurang lengkap</td></tr>
               </tbody>
             </table>
           </div>
@@ -819,16 +821,56 @@
     }
     function toggleSidebar() { document.getElementById('sidebar').classList.toggle('open'); }
 
-    /* ── Auth overlay (US-01 / US-02) ── */
+    /* ── Auth overlay (US-01 / US-02) + RBAC simulasi (US-03) ── */
     function setAuthTab(tab) {
       const isLogin = tab === 'login';
       document.getElementById('form-login').classList.toggle('hidden', !isLogin);
       document.getElementById('form-register').classList.toggle('hidden', isLogin);
       document.getElementById('tab-login').className = 'flex-1 py-2.5 rounded-xl text-xs font-extrabold transition ' + (isLogin ? 'bg-emerald-600 text-white shadow' : 'text-slate-500');
       document.getElementById('tab-register').className = 'flex-1 py-2.5 rounded-xl text-xs font-extrabold transition ' + (!isLogin ? 'bg-emerald-600 text-white shadow' : 'text-slate-500');
+      hideLoginError();
     }
     function openAuth(tab) { setAuthTab(tab || 'login'); document.getElementById('auth-overlay').classList.remove('hidden'); }
-    function closeAuth() { document.getElementById('auth-overlay').classList.add('hidden'); switchTab('dashboard'); }
+    function closeAuth() { document.getElementById('auth-overlay').classList.add('hidden'); }
+    function hideLoginError() { document.getElementById('login-error').classList.add('hidden'); }
+    function showLoginError(msg) {
+      document.getElementById('login-error-text').textContent = msg;
+      document.getElementById('login-error').classList.remove('hidden');
+    }
+
+    // Akun uji (DATA DUMMY). Password apa pun diterima — ini simulasi mockup.
+    const ACCOUNTS = {
+      admin_ketua:      { peran: 'ketua',     nama: 'Ketua Bank Sampah (DUMMY)',       label: 'Ketua Bank Sampah', avatar: 'IM', defaultView: 'dashboard' },
+      petugas_timbang1:      { peran: 'petugas',   nama: 'Petugas Timbang 1 (DUMMY)',         label: 'Petugas Timbang',   avatar: 'PY', defaultView: 'us04' },
+      petugas_timbang2:      { peran: 'petugas',   nama: 'Petugas Timbang 2 (DUMMY)',         label: 'Petugas Timbang',   avatar: 'IL', defaultView: 'us04' },
+      bendahara:  { peran: 'bendahara', nama: 'Bendahara (DUMMY)',       label: 'Bendahara',         avatar: 'IS', defaultView: 'us07' },
+      nasabah_a:       { peran: 'nasabah',   nama: 'Bpk. Nasabah A (DUMMY)', label: 'Nasabah (BS-000012)', avatar: 'FP', defaultView: 'us06' }
+    };
+
+    function handleLogin(event) {
+      event.preventDefault();
+      const username = document.getElementById('login-username').value.trim().toLowerCase();
+      const account = ACCOUNTS[username];
+      if (!account) {
+        showLoginError('Akun “' + (username || '(kosong)') + '” tidak dikenal. Gunakan salah satu akun uji pada tabel di bawah (password apa pun diterima).');
+        return;
+      }
+      hideLoginError();
+      applyRole(account);
+      closeAuth();
+    }
+
+    // RBAC simulasi: tampilkan/sembunyikan menu & ganti profil sesuai peran (US-03, REQ-03, NFR-02)
+    function applyRole(account) {
+      document.getElementById('sidebar-name').textContent = account.nama;
+      document.getElementById('sidebar-role').textContent = account.label;
+      document.getElementById('sidebar-avatar').textContent = account.avatar;
+      document.querySelectorAll('[data-roles]').forEach(el => {
+        const roles = el.getAttribute('data-roles').split(/\s+/);
+        el.style.display = roles.includes(account.peran) ? '' : 'none';
+      });
+      switchTab(account.defaultView);
+    }
 
     /* ── DATA DUMMY bersama ── */
     const JENIS = [
