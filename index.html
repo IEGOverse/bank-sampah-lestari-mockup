@@ -1,0 +1,1026 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Mockup UI Sistem Informasi Manajemen Bank Sampah Lestari — Tahap 4. Representasi desain, bukan aplikasi produksi.">
+  <title>Bank Sampah Lestari — Mockup UI (Tahap 4 Desain Sistem)</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            emerald: {
+              50:'#ecfdf5',100:'#d1fae5',200:'#a7f3d0',500:'#10b981',
+              600:'#059669',700:'#047857',800:'#065f46',900:'#064e3b',950:'#022c22'
+            }
+          },
+          fontFamily: {
+            sans: ['Inter','system-ui','sans-serif'],
+            mono: ['JetBrains Mono','monospace']
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600;700&display=swap');
+    body { font-family: 'Inter', sans-serif; }
+    .view-pane { display: none; }
+    .view-pane.active { display: block; animation: fadeIn 0.25s ease-out; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+    .glass-card { background: rgba(255,255,255,0.95); backdrop-filter: blur(16px); border: 1px solid rgba(226,232,240,0.85); }
+    .nav-item.active { background: linear-gradient(135deg,#059669,#047857); color:white; box-shadow:0 4px 14px rgba(5,150,105,0.35); font-weight:700; }
+    ::-webkit-scrollbar { width:6px; height:6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background:#cbd5e1; border-radius:999px; }
+    /* Sidebar responsif: off-canvas di HP, statis di desktop */
+    #sidebar { transition: transform .25s ease-in-out; }
+    @media (max-width: 1023px) {
+      #sidebar { position: fixed; inset: 0 auto 0 0; z-index: 40; transform: translateX(-100%); width: 20rem; }
+      #sidebar.open { transform: translateX(0); box-shadow: 0 0 0 9999px rgba(2,6,23,.55); }
+    }
+    .dummy-badge { display:inline-flex; align-items:center; gap:.35rem; font-size:10px; font-weight:800; letter-spacing:.06em; padding:.2rem .6rem; border-radius:.5rem; background:#fef3c7; color:#92400e; border:1px solid #fcd34d; text-transform:uppercase; }
+    .actor-badge { display:inline-flex; align-items:center; gap:.35rem; font-size:10px; font-weight:800; letter-spacing:.06em; padding:.2rem .6rem; border-radius:.5rem; text-transform:uppercase; }
+    .actor-ketua { background:#f3e8ff; color:#6b21a8; border:1px solid #d8b4fe; }
+    .actor-petugas { background:#dbeafe; color:#1e40af; border:1px solid #93c5fd; }
+    .actor-bendahara { background:#fef3c7; color:#92400e; border:1px solid #fcd34d; }
+    .actor-nasabah { background:#d1fae5; color:#065f46; border:1px solid #6ee7b7; }
+    .us-chip { font-family:'JetBrains Mono',monospace; font-size:10px; font-weight:700; padding:.15rem .45rem; border-radius:.4rem; background:#0f172a; color:#34d399; }
+    .input { width:100%; padding:.625rem 1rem; border-radius:.75rem; border:1px solid #cbd5e1; font-size:.875rem; outline:none; transition:.15s; background:#fff; }
+    .input:focus { border-color:#10b981; box-shadow:0 0 0 2px rgba(16,185,129,.35); }
+    .lbl { display:block; font-size:.75rem; font-weight:700; color:#334155; margin-bottom:.35rem; }
+    .btn { display:inline-flex; align-items:center; gap:.5rem; font-size:.75rem; font-weight:800; border-radius:.75rem; padding:.65rem 1.25rem; transition:.15s; }
+    .btn-primary { background:#059669; color:#fff; box-shadow:0 4px 12px rgba(5,150,105,.35); }
+    .btn-primary:hover { background:#047857; }
+    .btn-amber { background:#d97706; color:#fff; box-shadow:0 4px 12px rgba(217,119,6,.35); }
+    .btn-amber:hover { background:#b45309; }
+    .btn-slate { background:#fff; color:#475569; border:1px solid #e2e8f0; }
+    .btn-slate:hover { background:#f1f5f9; }
+    .tbl { width:100%; text-align:left; font-size:.75rem; border-collapse:collapse; }
+    .tbl thead th { background:#f1f5f9; color:#334155; font-weight:800; padding:.65rem .8rem; border-bottom:2px solid #e2e8f0; white-space:nowrap; }
+    .tbl tbody td { padding:.65rem .8rem; border-bottom:1px solid #f1f5f9; vertical-align:middle; }
+    .tbl tbody tr:hover { background:#f8fafc; }
+    .pill { display:inline-flex; align-items:center; gap:.3rem; font-size:10px; font-weight:800; padding:.2rem .55rem; border-radius:999px; }
+    .pill-ok { background:#d1fae5; color:#065f46; }
+    .pill-warn { background:#fef3c7; color:#92400e; }
+    .pill-red { background:#fee2e2; color:#991b1b; }
+  </style>
+</head>
+
+<body class="bg-slate-100/70 text-slate-800 flex h-screen overflow-hidden antialiased">
+
+  <!-- ══════════════════════════════════════════════════════════ -->
+  <!-- LAYAR AUTENTIKASI (US-01 Registrasi & US-02 Login)        -->
+  <!-- Ditampilkan pertama kali; tombol "Masuk" (simulasi)        -->
+  <!-- menutup layar ini dan menampilkan aplikasi.                -->
+  <!-- ══════════════════════════════════════════════════════════ -->
+  <div id="auth-overlay" class="fixed inset-0 z-50 flex">
+    <!-- Panel brand (desktop) -->
+    <div class="hidden lg:flex w-1/2 bg-gradient-to-br from-emerald-950 via-emerald-900 to-teal-950 text-white flex-col justify-between p-12 relative overflow-hidden">
+      <div class="absolute -right-16 -bottom-20 text-[320px] opacity-10 pointer-events-none"><i class="fa-solid fa-recycle"></i></div>
+      <div class="relative">
+        <div class="flex items-center space-x-3">
+          <div class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-emerald-500 to-teal-400 flex items-center justify-center shadow-lg"><i class="fa-solid fa-recycle text-2xl"></i></div>
+          <div>
+            <h1 class="text-xl font-black tracking-tight">Bank Sampah Lestari</h1>
+            <p class="text-emerald-300 text-xs">Sistem Informasi Manajemen · Kelurahan setempat</p>
+          </div>
+        </div>
+        <h2 class="text-4xl font-black leading-tight mt-14">Sampah bernilai,<br/>tabungan bertumbuh.</h2>
+        <p class="text-emerald-100/90 text-sm mt-4 max-w-md leading-relaxed">Catat setoran setiap Sabtu pagi, pantau saldo tabungan, kelola stok gudang dan kas operasional — transparan dan terdokumentasi.</p>
+        <ul class="mt-8 space-y-3 text-sm text-emerald-100/90">
+          <li class="flex items-center gap-2"><i class="fa-solid fa-circle-check text-emerald-400"></i> Setoran Sabtu pagi, ditimbang per jenis</li>
+          <li class="flex items-center gap-2"><i class="fa-solid fa-circle-check text-emerald-400"></i> 90% nilai setoran menjadi tabungan, 10% kas operasional</li>
+          <li class="flex items-center gap-2"><i class="fa-solid fa-circle-check text-emerald-400"></i> Harga ditetapkan Ketua setiap awal bulan</li>
+        </ul>
+      </div>
+      <p class="relative text-[11px] text-emerald-200/70">MOCKUP TAHAP 4 — seluruh data pada layar ini adalah <strong>DATA DUMMY</strong>. Bukan aplikasi produksi; tombol tidak menyimpan data.</p>
+    </div>
+
+    <!-- Panel form -->
+    <div class="flex-1 flex items-center justify-center p-4 sm:p-8 overflow-y-auto bg-slate-100">
+      <div class="w-full max-w-md">
+        <!-- Tabs -->
+        <div class="flex bg-white rounded-2xl shadow-sm border border-slate-200 p-1.5 mb-5">
+          <button id="tab-login" onclick="setAuthTab('login')" class="flex-1 py-2.5 rounded-xl text-xs font-extrabold transition bg-emerald-600 text-white shadow">Masuk <span class="font-mono opacity-80">· US-02</span></button>
+          <button id="tab-register" onclick="setAuthTab('register')" class="flex-1 py-2.5 rounded-xl text-xs font-extrabold transition text-slate-500">Daftar Nasabah <span class="font-mono opacity-80">· US-01</span></button>
+        </div>
+
+        <!-- ═══ FORM LOGIN (US-02 — Login Pengguna) · Aktor: semua aktor ═══ -->
+        <form id="form-login" onsubmit="event.preventDefault(); closeAuth();" class="glass-card rounded-3xl p-6 sm:p-8 shadow-xl space-y-4">
+          <div class="flex items-center justify-between">
+            <div>
+              <div class="flex items-center gap-2"><span class="us-chip">US-02</span><span class="actor-badge actor-nasabah">Aktor: Semua</span></div>
+              <h3 class="text-lg font-black text-slate-800 mt-2">Login Pengguna</h3>
+              <p class="text-[11px] text-slate-500">Masuk dengan akun masing-masing. Hak akses menyesuaikan peran.</p>
+            </div>
+            <i class="fa-solid fa-right-to-bracket text-3xl text-emerald-600/70"></i>
+          </div>
+          <div>
+            <label class="lbl" for="login-username">Username</label>
+            <input id="login-username" class="input" required autocomplete="username" placeholder="mis. petugas_timbang1">
+          </div>
+          <div>
+            <label class="lbl" for="login-password">Password</label>
+            <div class="relative">
+              <input id="login-password" type="password" class="input pr-11" required autocomplete="current-password" placeholder="••••••••">
+              <button type="button" onclick="const p=document.getElementById('login-password');p.type=p.type==='password'?'text':'password';" class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-700" aria-label="Tampilkan password"><i class="fa-regular fa-eye"></i></button>
+            </div>
+          </div>
+          <button type="submit" class="btn btn-primary w-full justify-center !py-3 text-sm"><i class="fa-solid fa-lock"></i> Masuk (Simulasi)</button>
+          <div class="text-[11px] text-slate-500 bg-slate-50 border border-slate-200 rounded-xl p-3">
+            <p class="font-extrabold text-slate-600 mb-1.5 flex items-center gap-1.5"><span class="dummy-badge">Data Dummy</span> Contoh akun uji (password: <code>password123</code>)</p>
+            <table class="w-full text-[10px]">
+              <tbody>
+                <tr class="border-b border-slate-200"><td class="py-1 font-mono">admin_ketua</td><td>Ketua</td></tr>
+                <tr class="border-b border-slate-200"><td class="py-1 font-mono">petugas_timbang1</td><td>Petugas Timbang</td></tr>
+                <tr class="border-b border-slate-200"><td class="py-1 font-mono">bendahara</td><td>Bendahara</td></tr>
+                <tr><td class="py-1 font-mono">nasabah_a</td><td>Nasabah (BS-000012)</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </form>
+
+        <!-- ═══ FORM REGISTRASI (US-01 — Registrasi Akun Nasabah) · Aktor: Calon Nasabah ═══ -->
+        <form id="form-register" onsubmit="event.preventDefault(); alert('SIMULASI MOCKUP — Akun berhasil dibuat dengan peran NASABAH (BS-000155).\nData tidak benar-benar tersimpan. Silakan masuk lewat tab Login.'); setAuthTab('login');" class="glass-card rounded-3xl p-6 sm:p-8 shadow-xl space-y-4 hidden">
+          <div class="flex items-center justify-between">
+            <div>
+              <div class="flex items-center gap-2"><span class="us-chip">US-01</span><span class="actor-badge actor-nasabah">Aktor: Calon Nasabah</span></div>
+              <h3 class="text-lg font-black text-slate-800 mt-2">Registrasi Akun Nasabah</h3>
+              <p class="text-[11px] text-slate-500">Akun baru otomatis berperan <strong>Nasabah</strong>. Peran pengurus hanya dapat ditetapkan pihak berwenang (US-03).</p>
+            </div>
+            <i class="fa-solid fa-user-plus text-3xl text-emerald-600/70"></i>
+          </div>
+          <div>
+            <label class="lbl" for="reg-nama">Nama Lengkap *</label>
+            <input id="reg-nama" class="input" required placeholder="mis. Bpk. Nasabah C">
+          </div>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label class="lbl" for="reg-hp">Nomor Telepon / HP *</label>
+              <input id="reg-hp" type="tel" class="input" required placeholder="08xx-xxxx-xxxx" pattern="[0-9+\-\s]{9,17}">
+            </div>
+            <div>
+              <label class="lbl" for="reg-user">Username *</label>
+              <input id="reg-user" class="input" required minlength="3" placeholder="min. 3 karakter">
+            </div>
+          </div>
+          <div>
+            <label class="lbl" for="reg-alamat">Alamat *</label>
+            <input id="reg-alamat" class="input" required placeholder="mis. Lingk. II / Jaga 2, Kelurahan setempat">
+          </div>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label class="lbl" for="reg-pass">Password *</label>
+              <input id="reg-pass" type="password" class="input" required minlength="8" placeholder="min. 8 karakter">
+            </div>
+            <div>
+              <label class="lbl" for="reg-pass2">Ulangi Password *</label>
+              <input id="reg-pass2" type="password" class="input" required minlength="8" placeholder="ketik ulang">
+            </div>
+          </div>
+          <!-- SENGAJA TIDAK ADA pilihan peran pengurus pada registrasi umum (REQ-05) -->
+          <div class="text-[11px] flex items-start gap-2 bg-emerald-50 border border-emerald-200 text-emerald-900 rounded-xl p-3">
+            <i class="fa-solid fa-shield-halved mt-0.5"></i>
+            <span>Setelah mendaftar, sistem menerbitkan <strong>No. Rekening (BS-XXXXXXX)</strong> dan akun berperan <strong>Nasabah</strong>. Peran Ketua / Petugas Timbang / Bendahara ditetapkan kemudian oleh Ketua melalui menu <em>“Penetapan Peran Pengurus (US-03)”</em>.</span>
+          </div>
+          <button type="submit" class="btn btn-primary w-full justify-center !py-3 text-sm"><i class="fa-solid fa-id-card"></i> Daftar Sekarang (Simulasi)</button>
+        </form>
+        <p class="text-center text-[10px] text-slate-400 mt-4">© 2026 Bank Sampah Lestari · Mockup UI Tahap 4 · <span class="dummy-badge">DATA DUMMY</span></p>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ══════════════════════════════════════════════════════════ -->
+  <!-- SIDEBAR NAVIGASI (responsif: off-canvas di HP)            -->
+  <!-- ══════════════════════════════════════════════════════════ -->
+  <aside id="sidebar" class="w-72 bg-slate-950 text-slate-300 flex flex-col justify-between shrink-0 border-r border-slate-800 select-none z-30 h-full">
+    <div class="flex flex-col min-h-0">
+      <!-- Brand -->
+      <div class="px-5 py-4 border-b border-slate-800/80 flex items-center justify-between bg-slate-900/90">
+        <div class="flex items-center space-x-3">
+          <div class="w-10 h-10 rounded-2xl bg-gradient-to-tr from-emerald-600 via-emerald-500 to-teal-400 flex items-center justify-center text-white shadow-lg">
+            <i class="fa-solid fa-recycle text-lg"></i>
+          </div>
+          <div>
+            <h1 class="font-extrabold text-white text-sm tracking-tight">Bank Sampah Lestari</h1>
+            <p class="text-[10px] text-slate-400">SIM · Kelurahan setempat</p>
+          </div>
+        </div>
+        <button class="lg:hidden text-slate-400 hover:text-white p-2" onclick="toggleSidebar()" aria-label="Tutup menu"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+
+      <!-- Disclaimer mockup -->
+      <div class="mx-4 mt-3 px-3 py-2 rounded-xl bg-amber-400/10 border border-amber-400/30 text-[10px] text-amber-300 leading-snug">
+        <strong>MOCKUP — TAHAP 4.</strong> Representasi desain, bukan aplikasi produksi. Semua data <strong>DATA DUMMY</strong>; tombol tidak menyimpan ke database.
+      </div>
+
+      <!-- Menu -->
+      <nav class="px-3 py-3 space-y-1 overflow-y-auto text-xs font-medium flex-1">
+        <button onclick="switchTab('dashboard')" class="nav-item active w-full flex items-center space-x-3 px-3.5 py-2.5 rounded-xl text-left transition-all text-slate-300 hover:bg-slate-800/80 hover:text-white" data-tab="dashboard">
+          <div class="w-7 h-7 rounded-lg bg-slate-800/80 flex items-center justify-center text-emerald-400 shrink-0"><i class="fa-solid fa-chart-pie text-sm"></i></div>
+          <div class="flex-1"><div class="font-bold text-[13px] text-white">Dashboard Pengawasan</div><div class="text-[9px] text-slate-400">Ringkasan untuk Ketua</div></div>
+        </button>
+
+        <div class="pt-3 pb-1 px-2 text-[9px] font-extrabold uppercase tracking-widest text-slate-500">Akses Publik</div>
+        <button onclick="openAuth('login')" class="nav-item w-full flex items-center space-x-3 px-3.5 py-2 rounded-xl text-left text-slate-300 hover:bg-slate-800/80" data-tab="__login">
+          <span class="us-chip">US-02</span><span>Login Pengguna</span>
+        </button>
+        <button onclick="openAuth('register')" class="nav-item w-full flex items-center space-x-3 px-3.5 py-2 rounded-xl text-left text-slate-300 hover:bg-slate-800/80" data-tab="__register">
+          <span class="us-chip">US-01</span><span>Registrasi Akun Nasabah</span>
+        </button>
+
+        <div class="pt-3 pb-1 px-2 flex items-center justify-between text-[9px] font-extrabold uppercase tracking-widest text-emerald-500"><span>Nasabah</span><span class="bg-emerald-900/60 text-emerald-300 px-1.5 py-0.5 rounded text-[8px]">1 US</span></div>
+        <button onclick="switchTab('us06')" class="nav-item w-full flex items-center space-x-3 px-3.5 py-2 rounded-xl text-left text-slate-300 hover:bg-slate-800/80" data-tab="us06">
+          <span class="us-chip">US-06</span><span>Saldo &amp; Riwayat Saya</span>
+        </button>
+
+        <div class="pt-3 pb-1 px-2 flex items-center justify-between text-[9px] font-extrabold uppercase tracking-widest text-blue-400"><span>Petugas Timbang</span><span class="bg-blue-900/60 text-blue-300 px-1.5 py-0.5 rounded text-[8px]">2 US</span></div>
+        <button onclick="switchTab('us04')" class="nav-item w-full flex items-center space-x-3 px-3.5 py-2 rounded-xl text-left text-slate-300 hover:bg-slate-800/80" data-tab="us04">
+          <span class="us-chip">US-04</span><span>Catat Setoran Sampah</span>
+        </button>
+        <button onclick="switchTab('us09')" class="nav-item w-full flex items-center space-x-3 px-3.5 py-2 rounded-xl text-left text-slate-300 hover:bg-slate-800/80" data-tab="us09">
+          <span class="us-chip">US-09</span><span>Penimbangan Ulang &amp; Penyusutan</span>
+        </button>
+
+        <div class="pt-3 pb-1 px-2 flex items-center justify-between text-[9px] font-extrabold uppercase tracking-widest text-amber-400"><span>Bendahara</span><span class="bg-amber-900/60 text-amber-300 px-1.5 py-0.5 rounded text-[8px]">2 US</span></div>
+        <button onclick="switchTab('us07')" class="nav-item w-full flex items-center space-x-3 px-3.5 py-2 rounded-xl text-left text-slate-300 hover:bg-slate-800/80" data-tab="us07">
+          <span class="us-chip">US-07</span><span>Catat Penarikan Tabungan</span>
+        </button>
+        <button onclick="switchTab('us11')" class="nav-item w-full flex items-center space-x-3 px-3.5 py-2 rounded-xl text-left text-slate-300 hover:bg-slate-800/80" data-tab="us11">
+          <span class="us-chip">US-11</span><span>Catat Kas Operasional</span>
+        </button>
+
+        <div class="pt-3 pb-1 px-2 flex items-center justify-between text-[9px] font-extrabold uppercase tracking-widest text-purple-400"><span>Ketua</span><span class="bg-purple-900/60 text-purple-300 px-1.5 py-0.5 rounded text-[8px]">6 US</span></div>
+        <button onclick="switchTab('us03')" class="nav-item w-full flex items-center space-x-3 px-3.5 py-2 rounded-xl text-left text-slate-300 hover:bg-slate-800/80" data-tab="us03">
+          <span class="us-chip">US-03</span><span>Penetapan Peran Pengurus</span>
+        </button>
+        <button onclick="switchTab('us05')" class="nav-item w-full flex items-center space-x-3 px-3.5 py-2 rounded-xl text-left text-slate-300 hover:bg-slate-800/80" data-tab="us05">
+          <span class="us-chip">US-05</span><span>Mengatur Harga Sampah</span>
+        </button>
+        <button onclick="switchTab('us08')" class="nav-item w-full flex items-center space-x-3 px-3.5 py-2 rounded-xl text-left text-slate-300 hover:bg-slate-800/80" data-tab="us08">
+          <span class="us-chip">US-08</span><span>Lihat Stok Sampah</span>
+        </button>
+        <button onclick="switchTab('us10')" class="nav-item w-full flex items-center space-x-3 px-3.5 py-2 rounded-xl text-left text-slate-300 hover:bg-slate-800/80" data-tab="us10">
+          <span class="us-chip">US-10</span><span>Catat Penjualan ke Pengepul</span>
+        </button>
+        <button onclick="switchTab('us12')" class="nav-item w-full flex items-center space-x-3 px-3.5 py-2 rounded-xl text-left text-slate-300 hover:bg-slate-800/80" data-tab="us12">
+          <span class="us-chip">US-12</span><span>Koreksi Transaksi</span>
+        </button>
+        <button onclick="switchTab('us13')" class="nav-item w-full flex items-center space-x-3 px-3.5 py-2 rounded-xl text-left text-slate-300 hover:bg-slate-800/80" data-tab="us13">
+          <span class="us-chip">US-13</span><span>Lihat Laporan</span>
+        </button>
+      </nav>
+    </div>
+
+    <!-- Profil dummy + logout -->
+    <div class="p-4 border-t border-slate-800/90 flex items-center justify-between">
+      <div class="flex items-center space-x-3">
+        <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-emerald-500 to-teal-400 flex items-center justify-center font-bold text-white text-xs">IM</div>
+        <div>
+          <div class="text-[11px] font-bold text-white leading-tight">Ketua Bank Sampah (DUMMY)</div>
+          <div class="text-[9px] text-emerald-400">Ketua Bank Sampah</div>
+        </div>
+      </div>
+      <button title="Keluar (kembali ke layar login)" onclick="openAuth('login')" class="text-slate-400 hover:text-white p-2 rounded-xl hover:bg-slate-800 transition"><i class="fa-solid fa-right-from-bracket text-xs"></i></button>
+    </div>
+  </aside>
+
+  <!-- ══════════════════════════════════════════════════════════ -->
+  <!-- AREA UTAMA                                                 -->
+  <!-- ══════════════════════════════════════════════════════════ -->
+  <main class="flex-1 flex flex-col overflow-y-auto min-w-0">
+    <!-- Top bar -->
+    <header class="bg-white/90 backdrop-blur-md border-b border-slate-200/80 px-4 sm:px-6 py-3 flex items-center justify-between sticky top-0 z-10 gap-3">
+      <div class="flex items-center space-x-3 min-w-0">
+        <button class="lg:hidden text-slate-600 hover:text-slate-900 p-2 -ml-2" onclick="toggleSidebar()" aria-label="Buka menu"><i class="fa-solid fa-bars text-lg"></i></button>
+        <span id="page-badge" class="px-2.5 py-1 rounded-full text-[10px] font-bold tracking-wide uppercase bg-emerald-100 text-emerald-800 border border-emerald-200 whitespace-nowrap">Dashboard</span>
+        <h2 id="page-title" class="text-sm sm:text-base font-extrabold text-slate-800 tracking-tight truncate">Ringkasan Pengawasan — Ketua</h2>
+      </div>
+      <div class="flex items-center gap-2 shrink-0">
+        <span class="hidden md:inline-flex items-center gap-1.5 px-3 py-1.5 bg-slate-100 rounded-full border border-slate-200 text-[10px] text-slate-600"><i class="fa-solid fa-calendar-day text-emerald-600"></i> Setoran: <strong>Sabtu 08.00–12.00</strong></span>
+        <span class="dummy-badge"><i class="fa-solid fa-flask"></i> Data Dummy</span>
+      </div>
+    </header>
+
+    <!-- Konten -->
+    <div class="p-4 sm:p-6 lg:p-8 flex-1 space-y-6">
+
+
+      <!-- ═══ DASHBOARD PENGAWASAN (Ketua) ═══ -->
+      <section id="view-dashboard" class="view-pane active space-y-6">
+        <div class="bg-gradient-to-r from-emerald-900 via-emerald-800 to-teal-900 rounded-3xl p-6 sm:p-8 text-white shadow-xl relative overflow-hidden border border-emerald-700/40">
+          <div class="absolute -right-8 -bottom-12 opacity-10 text-[180px] pointer-events-none"><i class="fa-solid fa-recycle"></i></div>
+          <div class="relative max-w-2xl">
+            <div class="flex items-center gap-2 mb-3 flex-wrap"><span class="actor-badge actor-ketua">Aktor: Ketua</span><span class="dummy-badge">Data Dummy</span></div>
+            <h2 class="text-xl sm:text-2xl font-black leading-tight">Sistem Informasi Manajemen<br/>Bank Sampah Lestari</h2>
+            <p class="text-emerald-100 text-xs mt-2 leading-relaxed">Ringkasan operasional untuk pengawasan Ketua: nasabah, stok gudang, tabungan (90%) dan kas operasional (10%).</p>
+            <div class="flex flex-wrap gap-2 mt-5">
+              <button onclick="switchTab('us04')" class="btn bg-white text-emerald-900 hover:bg-emerald-50"><i class="fa-solid fa-scale-balanced"></i> Mulai Penimbangan Sabtu</button>
+              <button onclick="switchTab('us08')" class="btn bg-emerald-950/70 border border-white/20 text-white hover:bg-emerald-950"><i class="fa-solid fa-warehouse text-emerald-400"></i> Cek Stok Gudang</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+          <div class="glass-card p-4 sm:p-5 rounded-2xl"><p class="text-[10px] font-extrabold text-slate-400 uppercase">Nasabah Terdaftar</p><h3 class="text-xl sm:text-2xl font-black mt-1">154 KK</h3><p class="text-[9px] text-slate-400 mt-1">DATA DUMMY</p></div>
+          <div class="glass-card p-4 sm:p-5 rounded-2xl"><p class="text-[10px] font-extrabold text-slate-400 uppercase">Stok Gudang</p><h3 class="text-xl sm:text-2xl font-black mt-1">1.840 kg</h3><p class="text-[9px] text-slate-400 mt-1">DATA DUMMY · 7 jenis</p></div>
+          <div class="glass-card p-4 sm:p-5 rounded-2xl"><p class="text-[10px] font-extrabold text-slate-400 uppercase">Tabungan (90%)</p><h3 class="text-xl sm:text-2xl font-black mt-1 font-mono">Rp 14.850.000</h3><p class="text-[9px] text-slate-400 mt-1">DATA DUMMY</p></div>
+          <div class="glass-card p-4 sm:p-5 rounded-2xl"><p class="text-[10px] font-extrabold text-slate-400 uppercase">Kas Operasional (10%)</p><h3 class="text-xl sm:text-2xl font-black mt-1 font-mono">Rp 1.650.000</h3><p class="text-[9px] text-slate-400 mt-1">DATA DUMMY</p></div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
+          <div class="lg:col-span-2 glass-card p-5 sm:p-6 rounded-3xl">
+            <div class="flex items-center justify-between mb-4 gap-2 flex-wrap">
+              <h3 class="font-extrabold text-sm text-slate-800">Komposisi Stok per Jenis <span class="dummy-badge ml-1">Data Dummy</span></h3>
+              <button onclick="switchTab('us13')" class="text-[11px] font-bold text-emerald-700 hover:text-emerald-900">Lihat laporan lengkap → US-13</button>
+            </div>
+            <div class="space-y-3 text-xs" id="dash-bars"><!-- diisi JS (DATA DUMMY) --></div>
+          </div>
+          <div class="glass-card p-5 sm:p-6 rounded-3xl">
+            <h3 class="font-extrabold text-sm text-slate-800 mb-3">Pengingat Operasional</h3>
+            <ul class="text-[11px] space-y-2 text-slate-600">
+              <li class="flex gap-2"><i class="fa-solid fa-calendar-check text-emerald-600 mt-0.5"></i> Setoran setiap <strong>Sabtu pagi</strong> (BR-01).</li>
+              <li class="flex gap-2"><i class="fa-solid fa-tag text-emerald-600 mt-0.5"></i> Harga ditetapkan <strong>awal bulan</strong> (BR-04) → menu US-05.</li>
+              <li class="flex gap-2"><i class="fa-solid fa-truck text-emerald-600 mt-0.5"></i> Pengepul datang <strong>± 2 mingguan</strong> (BR-10); catat penimbangan ulang → US-09.</li>
+              <li class="flex gap-2"><i class="fa-solid fa-hand-holding-dollar text-emerald-600 mt-0.5"></i> Penarikan min <strong>Rp50.000</strong>, maks <strong>1×/bulan</strong>; khusus <strong>Desember</strong> boleh seluruh saldo (BR-08, BR-09).</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <!-- ═══ US-03 · PENETAPAN PERAN PENGURUS (Ketua) ═══ -->
+      <section id="view-us03" class="view-pane space-y-5">
+        <div class="glass-card p-5 sm:p-6 rounded-3xl">
+          <div class="flex items-start justify-between gap-3 border-b pb-4 mb-5 flex-wrap">
+            <div>
+              <div class="flex items-center gap-2 flex-wrap"><span class="us-chip">US-03</span><span class="actor-badge actor-ketua">Aktor: Ketua</span><span class="dummy-badge">Data Dummy</span></div>
+              <h3 class="text-lg font-black text-slate-800 mt-2">Penetapan Peran Pengurus</h3>
+              <p class="text-[11px] text-slate-500">Pilih akun berperan <strong>Nasabah</strong>, lalu tetapkan menjadi Ketua / Petugas Timbang / Bendahara. Perubahan tercatat di audit log (REQ-18).</p>
+            </div>
+            <div class="w-11 h-11 rounded-2xl bg-purple-50 text-purple-600 flex items-center justify-center text-lg"><i class="fa-solid fa-user-shield"></i></div>
+          </div>
+
+          <label class="lbl" for="us03-search">Cari akun (nama / username / no. rekening)</label>
+          <div class="flex gap-2 mb-4">
+            <input id="us03-search" class="input" placeholder="mis. Ronald / BS-000031">
+            <button class="btn btn-slate" onclick="alert('SIMULASI MOCKUP — hasil pencarian ditampilkan dari DATA DUMMY.')"><i class="fa-solid fa-magnifying-glass"></i> Cari</button>
+          </div>
+
+          <div class="overflow-x-auto rounded-2xl border border-slate-200">
+            <table class="tbl">
+              <thead><tr><th>Nama</th><th>Username</th><th>No. Rekening</th><th>No. Buku Tabungan</th><th>Peran Saat Ini</th><th>Tetapkan Menjadi</th><th class="text-center">Aksi</th></tr></thead>
+              <tbody id="us03-tbody"></tbody>
+            </table>
+          </div>
+          <p class="text-[10px] text-slate-400 mt-3 flex items-center gap-1.5"><i class="fa-solid fa-circle-info"></i> Peran pengurus tidak dapat dipilih sendiri saat registrasi (REQ-05). Penonaktifan akun: status diubah menjadi nonaktif, <strong>bukan</strong> dihapus (integritas transaksi).</p>
+        </div>
+      </section>
+
+      <!-- ═══ US-04 · MENCATAT SETORAN SAMPAH (Petugas Timbang) ═══ -->
+      <section id="view-us04" class="view-pane space-y-5">
+        <div class="glass-card p-5 sm:p-6 rounded-3xl">
+          <div class="flex items-start justify-between gap-3 border-b pb-4 mb-5 flex-wrap">
+            <div>
+              <div class="flex items-center gap-2 flex-wrap"><span class="us-chip">US-04</span><span class="actor-badge actor-petugas">Aktor: Petugas Timbang</span><span class="dummy-badge">Data Dummy</span></div>
+              <h3 class="text-lg font-black text-slate-800 mt-2">Catat Setoran Sampah — Sabtu Pagi</h3>
+              <p class="text-[11px] text-slate-500">Harga diambil dari periode bulan setoran (BR-05). Nilai setoran = berat × harga (BR-06). Pembagian: <strong>90% tabungan · 10% kas operasional</strong> (BR-07).</p>
+            </div>
+            <div class="w-11 h-11 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center text-lg"><i class="fa-solid fa-scale-balanced"></i></div>
+          </div>
+
+          <form onsubmit="event.preventDefault(); simpanSetoran();" class="space-y-4">
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              <div class="sm:col-span-2">
+                <label class="lbl" for="us04-nasabah">Nasabah *</label>
+                <select id="us04-nasabah" class="input font-semibold" required>
+                  <option value="">— pilih nasabah —</option>
+                  <option>BS-000012 — Bpk. Nasabah A</option>
+                  <option>BS-000028 — Ibu Nasabah B</option>
+                  <option>BS-000031 — Bpk. Nasabah C</option>
+                </select>
+              </div>
+              <div>
+                <label class="lbl" for="us04-tgl">Tanggal Setoran *</label>
+                <input id="us04-tgl" type="date" class="input" required value="2026-11-14">
+              </div>
+            </div>
+
+            <div class="overflow-x-auto rounded-2xl border border-slate-200">
+              <table class="tbl min-w-[640px]">
+                <thead><tr><th>Jenis Sampah</th><th class="text-right">Berat (kg)</th><th class="text-right">Harga/kg (bln berjalan)</th><th class="text-right">Subtotal</th><th></th></tr></thead>
+                <tbody id="us04-rows"></tbody>
+                <tfoot class="bg-slate-50 font-bold text-xs">
+                  <tr><td class="p-3" colspan="3">TOTAL</td><td class="p-3 text-right font-mono" id="us04-total">Rp 0</td><td></td></tr>
+                </tfoot>
+              </table>
+            </div>
+            <button type="button" onclick="tambahBarisSetoran()" class="btn btn-slate !py-2"><i class="fa-solid fa-plus"></i> Tambah Jenis</button>
+
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              <div class="p-4 rounded-2xl bg-emerald-50 border border-emerald-200"><p class="text-[10px] font-extrabold text-emerald-800 uppercase">Tabungan Nasabah (90%)</p><p class="text-lg font-black font-mono text-emerald-900 mt-1" id="us04-tabungan">Rp 0</p></div>
+              <div class="p-4 rounded-2xl bg-purple-50 border border-purple-200"><p class="text-[10px] font-extrabold text-purple-800 uppercase">Kas Operasional (10%)</p><p class="text-lg font-black font-mono text-purple-900 mt-1" id="us04-kas">Rp 0</p></div>
+              <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200"><p class="text-[10px] font-extrabold text-slate-500 uppercase">No. Referensi (otomatis)</p><p class="text-lg font-black font-mono text-slate-800 mt-1">SET-202611-00042</p></div>
+            </div>
+
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 pt-2 border-t border-slate-100">
+              <p class="text-[10px] text-slate-400 max-w-sm"><i class="fa-solid fa-circle-info"></i> Harga baris berasal dari periode harga bulan berjalan (lihat US-05). Transaksi tersimpan atomik bersama stok &amp; kas.</p>
+              <div class="flex gap-2 justify-end">
+                <button type="reset" class="btn btn-slate">Batal</button>
+                <button type="submit" class="btn btn-primary"><i class="fa-solid fa-floppy-disk"></i> Simpan Setoran (Simulasi)</button>
+              </div>
+            </div>
+          </form>
+        </div>
+      </section>
+
+      <!-- ═══ US-05 · MENGATUR HARGA SAMPAH (Ketua) ═══ -->
+      <section id="view-us05" class="view-pane space-y-5">
+        <div class="glass-card p-5 sm:p-6 rounded-3xl">
+          <div class="flex items-start justify-between gap-3 border-b pb-4 mb-5 flex-wrap">
+            <div>
+              <div class="flex items-center gap-2 flex-wrap"><span class="us-chip">US-05</span><span class="actor-badge actor-ketua">Aktor: Ketua</span><span class="dummy-badge">Data Dummy</span></div>
+              <h3 class="text-lg font-black text-slate-800 mt-2">Mengatur Harga Sampah per kg (Awal Bulan)</h3>
+              <p class="text-[11px] text-slate-500">Harga periode berjalan tersimpan bersama periode mulai–berakhir. Setoran bulan sebelumnya tetap memakai harga historis (BR-05).</p>
+            </div>
+            <div class="w-11 h-11 rounded-2xl bg-purple-50 text-purple-600 flex items-center justify-center text-lg"><i class="fa-solid fa-tags"></i></div>
+          </div>
+
+          <form onsubmit="event.preventDefault(); alert('SIMULASI MOCKUP — harga periode November 2026 tersimpan. Periode Oktober 2026 ditutup otomatis (periode_selesai = 2026-10-31). Data tidak benar-benar tersimpan.')" class="space-y-4">
+            <div class="flex flex-wrap items-end gap-3">
+              <div><label class="lbl" for="us05-bulan">Periode Berlaku Mulai</label><input id="us05-bulan" type="date" class="input w-48" required value="2026-12-01"></div>
+              <p class="text-[10px] text-slate-400 pb-2 max-w-[16rem]">Kosongkan periode berakhir = harga masih berlaku. Periode tidak boleh tumpang tindih (dijaga constraint database).</p>
+            </div>
+            <div class="overflow-x-auto rounded-2xl border border-slate-200">
+              <table class="tbl">
+                <thead><tr><th>Jenis Sampah</th><th>Kategori</th><th class="text-right">Harga Berjalan (Rp/kg) — DUMMY</th><th class="text-right">Harga Baru (Rp/kg)</th></tr></thead>
+                <tbody id="us05-tbody"></tbody>
+              </table>
+            </div>
+            <div class="flex justify-end"><button type="submit" class="btn btn-primary"><i class="fa-solid fa-floppy-disk"></i> Simpan Harga Periode (Simulasi)</button></div>
+          </form>
+        </div>
+
+        <div class="glass-card p-5 sm:p-6 rounded-3xl">
+          <h4 class="font-extrabold text-sm text-slate-800 mb-3">Riwayat Harga (contoh) <span class="dummy-badge">Data Dummy</span></h4>
+          <div class="overflow-x-auto rounded-2xl border border-slate-200">
+            <table class="tbl">
+              <thead><tr><th>Jenis</th><th>Periode Mulai</th><th>Periode Berakhir</th><th class="text-right">Harga/kg</th><th>Ditetapkan oleh</th></tr></thead>
+              <tbody>
+                <tr><td>Botol Plastik</td><td>2026-11-01</td><td><span class="pill pill-ok">Masih berlaku</span></td><td class="text-right font-mono">2.500</td><td>Ketua (Ketua Bank Sampah)</td></tr>
+                <tr><td>Botol Plastik</td><td>2026-10-01</td><td>2026-10-31</td><td class="text-right font-mono">2.300</td><td>Ketua (Ketua Bank Sampah)</td></tr>
+                <tr><td>Kardus</td><td>2026-11-01</td><td><span class="pill pill-ok">Masih berlaku</span></td><td class="text-right font-mono">1.500</td><td>Ketua (Ketua Bank Sampah)</td></tr>
+                <tr><td>Besi</td><td>2026-11-01</td><td><span class="pill pill-ok">Masih berlaku</span></td><td class="text-right font-mono">5.000</td><td>Ketua (Ketua Bank Sampah)</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+
+      <!-- ═══ US-06 · MEMERIKSA SALDO DAN RIWAYAT (Nasabah) ═══ -->
+      <section id="view-us06" class="view-pane space-y-5">
+        <div class="rounded-3xl p-6 sm:p-7 bg-gradient-to-tr from-slate-950 via-emerald-950 to-slate-900 text-white shadow-2xl border border-emerald-500/30 relative overflow-hidden">
+          <div class="absolute -right-8 -bottom-8 opacity-10 text-[140px] pointer-events-none"><i class="fa-solid fa-wallet"></i></div>
+          <div class="flex justify-between items-start gap-4 flex-wrap relative">
+            <div>
+              <div class="flex items-center gap-2 flex-wrap"><span class="us-chip">US-06</span><span class="actor-badge actor-nasabah">Aktor: Nasabah</span><span class="dummy-badge">Data Dummy</span></div>
+              <h3 class="text-xl sm:text-2xl font-black mt-3">Bpk. Nasabah A</h3>
+              <p class="text-xs text-slate-300 font-mono">No. Rekening: BS-000012 · Terdaftar 2024-03-02</p>
+            </div>
+            <i class="fa-solid fa-shield-halved text-3xl text-emerald-400"></i>
+          </div>
+          <div class="pt-5 mt-5 border-t border-white/10 flex justify-between items-end flex-wrap gap-4 relative">
+            <div><span class="text-[10px] text-slate-400">SALDO TABUNGAN SAYA</span><h2 class="text-2xl sm:text-3xl font-black text-emerald-400 font-mono mt-1">Rp 306.875</h2></div>
+            <div class="text-[10px] text-slate-400 max-w-[14rem] text-right">Anda hanya dapat melihat data milik Anda sendiri (REQ-11).</div>
+          </div>
+        </div>
+
+        <div class="glass-card p-5 sm:p-6 rounded-3xl">
+          <h4 class="font-extrabold text-sm text-slate-800 mb-3">Riwayat Setoran &amp; Penarikan Saya <span class="dummy-badge">Data Dummy</span></h4>
+          <div class="overflow-x-auto rounded-2xl border border-slate-200">
+            <table class="tbl">
+              <thead><tr><th>Tanggal</th><th>Aktivitas</th><th>Keterangan</th><th class="text-right">Nominal</th><th class="text-right">Saldo Berjalan</th></tr></thead>
+              <tbody>
+                <tr><td class="text-slate-500">2026-11-07</td><td><span class="pill pill-ok">Setoran</span></td><td>35,5 kg · ref SET-202611-00031</td><td class="text-right font-bold text-emerald-600">+ Rp 61.875</td><td class="text-right font-mono">Rp 306.875</td></tr>
+                <tr><td class="text-slate-500">2026-10-31</td><td><span class="pill pill-ok">Setoran</span></td><td>20,0 kg kardus · ref SET-202610-00018</td><td class="text-right font-bold text-emerald-600">+ Rp 27.000</td><td class="text-right font-mono">Rp 245.000</td></tr>
+                <tr><td class="text-slate-500">2026-10-24</td><td><span class="pill pill-red">Penarikan</span></td><td>Penarikan bulanan · ref TRK-202610-00007</td><td class="text-right font-bold text-red-600">− Rp 100.000</td><td class="text-right font-mono">Rp 218.000</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Panel pengurus: membantu pemeriksaan buku tabungan hilang/berbeda -->
+        <div class="glass-card p-5 sm:p-6 rounded-3xl border-l-4 !border-l-amber-400">
+          <div class="flex items-center gap-2 flex-wrap mb-2"><span class="actor-badge actor-ketua">Aktor: Ketua / Bendahara (kewenangan terbatas)</span><span class="dummy-badge">Data Dummy</span></div>
+          <h4 class="font-extrabold text-sm text-slate-800">Pemeriksaan Nasabah oleh Pengurus</h4>
+          <p class="text-[11px] text-slate-500 mb-3">Untuk kasus buku tabungan hilang / basah / berbeda dengan catatan (US-06). Cari berdasarkan no. rekening:</p>
+          <div class="flex gap-2 max-w-md">
+            <input class="input" placeholder="BS-000012" value="BS-000012" aria-label="No. rekening">
+            <button class="btn btn-slate" onclick="alert('SIMULASI MOCKUP — menampilkan saldo & riwayat BS-000012 (DATA DUMMY).')"><i class="fa-solid fa-magnifying-glass"></i> Tampilkan</button>
+          </div>
+          <p class="text-[10px] text-slate-400 mt-2"><i class="fa-solid fa-lock"></i> Petugas Timbang tidak memiliki akses saldo; Bendahara melihat untuk keperluan penarikan; Ketua untuk pengawasan. Semua akses tercatat di audit log (NFR-09).</p>
+        </div>
+      </section>
+
+      <!-- ═══ US-07 · MENCATAT PENARIKAN TABUNGAN (Bendahara) ═══ -->
+      <section id="view-us07" class="view-pane space-y-5">
+        <div class="max-w-2xl mx-auto glass-card p-5 sm:p-7 rounded-3xl w-full">
+          <div class="flex items-start justify-between gap-3 border-b pb-4 mb-5 flex-wrap">
+            <div>
+              <div class="flex items-center gap-2 flex-wrap"><span class="us-chip">US-07</span><span class="actor-badge actor-bendahara">Aktor: Bendahara</span><span class="dummy-badge">Data Dummy</span></div>
+              <h3 class="text-lg font-black text-slate-800 mt-2">Catat Penarikan Tabungan</h3>
+              <p class="text-[11px] text-slate-500">Ketentuan: minimal <strong>Rp50.000</strong>, maksimal <strong>1× dalam sebulan</strong>; khusus bulan <strong>Desember</strong> nasabah boleh menarik <strong>seluruh</strong> tabungan (BR-08, BR-09).</p>
+            </div>
+            <div class="w-11 h-11 rounded-2xl bg-amber-50 text-amber-600 flex items-center justify-center text-lg"><i class="fa-solid fa-money-bill-transfer"></i></div>
+          </div>
+
+          <form onsubmit="event.preventDefault(); prosesPenarikan();" class="space-y-4">
+            <div>
+              <label class="lbl" for="us07-nasabah">Cari Nasabah (no. rekening / nama) *</label>
+              <select id="us07-nasabah" class="input font-semibold" required onchange="previewPenarikan()">
+                <option value="306875">BS-000012 — Bpk. Nasabah A · Saldo: Rp 306.875 · Penarikan bulan ini: belum ada</option>
+                <option value="120000">BS-000028 — Ibu Nasabah B · Saldo: Rp 120.000 · Penarikan bulan ini: belum ada</option>
+                <option value="0">BS-000031 — Bpk. Nasabah C · Saldo: Rp 0 · Penarikan bulan ini: 1× (sudah)</option>
+              </select>
+            </div>
+            <div class="grid grid-cols-2 gap-3">
+              <div class="p-3 rounded-2xl bg-slate-50 border border-slate-200"><p class="text-[9px] font-extrabold text-slate-500 uppercase">Saldo Saat Ini</p><p class="font-mono font-black text-slate-800" id="us07-saldo">Rp 306.875</p></div>
+              <div class="p-3 rounded-2xl bg-slate-50 border border-slate-200"><p class="text-[9px] font-extrabold text-slate-500 uppercase">Sisa Setelah Penarikan</p><p class="font-mono font-black text-emerald-700" id="us07-sisa">Rp 206.875</p></div>
+            </div>
+            <div>
+              <label class="lbl" for="us07-jumlah">Jumlah Penarikan (Rp) * <span class="normal-case font-medium text-slate-400">(min 50.000; Desember boleh seluruh saldo)</span></label>
+              <input id="us07-jumlah" type="number" min="1" step="1000" class="input font-mono font-bold" required value="100000" oninput="previewPenarikan()">
+              <p class="text-[10px] text-red-500 mt-1 hidden" id="us07-error">Melebihi saldo / di bawah minimal / sudah 1× bulan ini — perhatikan ketentuan.</p>
+            </div>
+            <div>
+              <label class="lbl" for="us07-bendahara">Bendahara Pemroses</label>
+              <input class="input bg-slate-100" readonly value="Bendahara (Bendahara) — DUMMY">
+            </div>
+            <label class="flex items-start gap-2 text-[11px] text-slate-600 bg-amber-50 border border-amber-200 rounded-xl p-3 cursor-pointer">
+              <input type="checkbox" class="mt-0.5" required>
+              <span>Saya sudah memverifikasi identitas nasabah dan menghitung uang fisik bersama nasabah sebelum menyimpan transaksi.</span>
+            </label>
+            <div class="flex items-center justify-between gap-3 flex-wrap pt-2 border-t border-slate-100">
+              <p class="text-[10px] text-slate-400">No. referensi otomatis: <span class="font-mono font-bold text-slate-700">TRK-202611-00007</span> (REQ-19)</p>
+              <div class="flex gap-2"><button type="reset" class="btn btn-slate">Batal</button><button type="submit" class="btn btn-amber"><i class="fa-solid fa-check"></i> Simpan Penarikan (Simulasi)</button></div>
+            </div>
+          </form>
+        </div>
+      </section>
+
+      <!-- ═══ US-08 · MELIHAT STOK SAMPAH (Ketua) ═══ -->
+      <section id="view-us08" class="view-pane space-y-5">
+        <div class="glass-card p-5 sm:p-6 rounded-3xl">
+          <div class="flex items-start justify-between gap-3 border-b pb-4 mb-5 flex-wrap">
+            <div>
+              <div class="flex items-center gap-2 flex-wrap"><span class="us-chip">US-08</span><span class="actor-badge actor-ketua">Aktor: Ketua</span><span class="dummy-badge">Data Dummy</span></div>
+              <h3 class="text-lg font-black text-slate-800 mt-2">Stok Sampah di Gudang per Jenis</h3>
+              <p class="text-[11px] text-slate-500">Pantauan sebelum pengepul datang (± 2 mingguan, BR-10) — tanpa harus memeriksa gudang langsung. Stok bertambah dari setoran, berkurang dari penjualan.</p>
+            </div>
+            <div class="w-11 h-11 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-lg"><i class="fa-solid fa-warehouse"></i></div>
+          </div>
+          <div class="overflow-x-auto rounded-2xl border border-slate-200">
+            <table class="tbl">
+              <thead><tr><th>Jenis Sampah</th><th>Kategori</th><th class="text-right">Stok (kg)</th><th class="text-right">Estimasi Nilai (Rp)</th><th>Terakhir Diperbarui</th><th>Status</th></tr></thead>
+              <tbody id="us08-tbody"></tbody>
+              <tfoot class="bg-slate-50 font-bold text-xs"><tr><td colspan="2" class="p-3">TOTAL</td><td class="p-3 text-right font-mono">1.840,0</td><td class="p-3 text-right font-mono">4.392.000</td><td colspan="2"></td></tr></tfoot>
+            </table>
+          </div>
+          <div class="flex justify-end mt-4"><button class="btn btn-slate" onclick="switchTab('us10')"><i class="fa-solid fa-truck-ramp-box"></i> Catat Penjualan ke Pengepul → US-10</button></div>
+        </div>
+      </section>
+
+      <!-- ═══ US-09 · PENIMBANGAN ULANG & PENYUSUTAN (Petugas Timbang) ═══ -->
+      <section id="view-us09" class="view-pane space-y-5">
+        <div class="glass-card p-5 sm:p-6 rounded-3xl">
+          <div class="flex items-start justify-between gap-3 border-b pb-4 mb-5 flex-wrap">
+            <div>
+              <div class="flex items-center gap-2 flex-wrap"><span class="us-chip">US-09</span><span class="actor-badge actor-petugas">Aktor: Petugas Timbang</span><span class="dummy-badge">Data Dummy</span></div>
+              <h3 class="text-lg font-black text-slate-800 mt-2">Penimbangan Ulang oleh Pengepul &amp; Penyusutan</h3>
+              <p class="text-[11px] text-slate-500">Selisih antara catatan Bank Sampah dan hasil timbang pengepul dicatat sebagai <strong>penyusutan</strong> (BR-11, REQ-15). Pengepul datang ± 2 mingguan (BR-10).</p>
+            </div>
+            <div class="w-11 h-11 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center text-lg"><i class="fa-solid fa-weight-scale"></i></div>
+          </div>
+
+          <form onsubmit="event.preventDefault(); alert('SIMULASI MOCKUP — penimbangan ulang tersimpan, penyusutan tercatat, stok disesuaikan. Data tidak benar-benar tersimpan.')" class="space-y-4">
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              <div><label class="lbl" for="us09-tgl">Tanggal Penimbangan *</label><input id="us09-tgl" type="date" class="input" required value="2026-11-14"></div>
+              <div><label class="lbl" for="us09-petugas">Petugas Pencatat</label><input class="input bg-slate-100" readonly value="Petugas Timbang 1 (Petugas Timbang) — DUMMY"></div>
+              <div><label class="lbl" for="us09-ref">No. Referensi</label><input class="input bg-slate-100 font-mono" readonly value="PEN-202611-00002"></div>
+            </div>
+            <div class="overflow-x-auto rounded-2xl border border-slate-200">
+              <table class="tbl min-w-[680px]">
+                <thead><tr><th>Jenis</th><th class="text-right">Catatan Bank Sampah (kg)</th><th class="text-right">Hasil Pengepul (kg)</th><th class="text-right">Selisih</th><th>Status</th></tr></thead>
+                <tbody id="us09-tbody"></tbody>
+              </table>
+            </div>
+            <div class="flex justify-end gap-2"><button type="reset" class="btn btn-slate">Batal</button><button type="submit" class="btn btn-primary"><i class="fa-solid fa-floppy-disk"></i> Simpan Penimbangan Ulang (Simulasi)</button></div>
+          </form>
+        </div>
+      </section>
+
+
+      <!-- ═══ US-10 · MENCATAT PENJUALAN KEPADA PENGEPUL (pengurus berwenang) ═══ -->
+      <section id="view-us10" class="view-pane space-y-5">
+        <div class="glass-card p-5 sm:p-6 rounded-3xl">
+          <div class="flex items-start justify-between gap-3 border-b pb-4 mb-5 flex-wrap">
+            <div>
+              <div class="flex items-center gap-2 flex-wrap"><span class="us-chip">US-10</span><span class="actor-badge actor-ketua">Aktor: Pengurus Berwenang (Ketua)</span><span class="dummy-badge">Data Dummy</span></div>
+              <h3 class="text-lg font-black text-slate-800 mt-2">Catat Penjualan Sampah kepada Pengepul</h3>
+              <p class="text-[11px] text-slate-500">Mencatat jenis &amp; jumlah yang keluar dari gudang; stok berkurang otomatis (REQ-16). <strong>Rincian pembayaran pengepul belum dipastikan klien</strong> — harga jual sengaja tidak ditampilkan.</p>
+            </div>
+            <div class="w-11 h-11 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-lg"><i class="fa-solid fa-truck-ramp-box"></i></div>
+          </div>
+
+          <form onsubmit="event.preventDefault(); alert('SIMULASI MOCKUP — penjualan tercatat, stok gudang berkurang sesuai jumlah keluar. Data tidak benar-benar tersimpan.')" class="space-y-4">
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              <div><label class="lbl" for="us10-tgl">Tanggal Penjualan *</label><input id="us10-tgl" type="date" class="input" required value="2026-11-14"></div>
+              <div><label class="lbl" for="us10-pencatat">Pencatat</label><input class="input bg-slate-100" readonly value="Ketua Bank Sampah (Ketua) — DUMMY"></div>
+              <div><label class="lbl" for="us10-ref">No. Referensi</label><input class="input bg-slate-100 font-mono" readonly value="JLN-202611-00003"></div>
+            </div>
+            <div class="overflow-x-auto rounded-2xl border border-slate-200">
+              <table class="tbl min-w-[640px]">
+                <thead><tr><th>Jenis Sampah</th><th class="text-right">Stok Tersedia (kg)</th><th class="text-right">Jumlah Dijual (kg)</th><th class="text-right">Sisa Stok</th><th></th></tr></thead>
+                <tbody id="us10-rows"></tbody>
+              </table>
+            </div>
+            <button type="button" onclick="tambahBarisPenjualan()" class="btn btn-slate !py-2"><i class="fa-solid fa-plus"></i> Tambah Jenis</button>
+            <div><label class="lbl" for="us10-ket">Keterangan</label><input id="us10-ket" class="input" placeholder="mis. Penjualan rutin ke pengepul — DUMMY" value="Penjualan rutin ± 2 mingguan — DUMMY"></div>
+            <div class="flex justify-end gap-2"><button type="reset" class="btn btn-slate">Batal</button><button type="submit" class="btn btn-primary"><i class="fa-solid fa-floppy-disk"></i> Simpan Penjualan (Simulasi)</button></div>
+          </form>
+        </div>
+      </section>
+
+      <!-- ═══ US-11 · MENCATAT KAS OPERASIONAL (Bendahara) ═══ -->
+      <section id="view-us11" class="view-pane space-y-5">
+        <div class="grid grid-cols-1 lg:grid-cols-5 gap-5">
+          <div class="lg:col-span-2 glass-card p-5 sm:p-6 rounded-3xl">
+            <div class="flex items-center gap-2 flex-wrap"><span class="us-chip">US-11</span><span class="actor-badge actor-bendahara">Aktor: Bendahara</span><span class="dummy-badge">Data Dummy</span></div>
+            <h3 class="text-lg font-black text-slate-800 mt-2">Catat Kas Operasional</h3>
+            <p class="text-[11px] text-slate-500 mb-4">Pemasukan (termasuk 10% setoran) &amp; pengeluaran, mis. pembelian karung dan biaya transportasi (BR-12, REQ-17).</p>
+            <form onsubmit="event.preventDefault(); alert('SIMULASI MOCKUP — transaksi kas tersimpan. Data tidak benar-benar tersimpan.')" class="space-y-4">
+              <div class="grid grid-cols-2 gap-2" role="radiogroup" aria-label="Tipe transaksi">
+                <label class="flex items-center gap-2 border border-emerald-300 bg-emerald-50 rounded-xl p-3 cursor-pointer text-xs font-bold text-emerald-900"><input type="radio" name="tipe-kas" checked> Pemasukan</label>
+                <label class="flex items-center gap-2 border border-red-200 bg-red-50 rounded-xl p-3 cursor-pointer text-xs font-bold text-red-900"><input type="radio" name="tipe-kas"> Pengeluaran</label>
+              </div>
+              <div><label class="lbl" for="us11-tgl">Tanggal *</label><input id="us11-tgl" type="date" class="input" required value="2026-11-14"></div>
+              <div><label class="lbl" for="us11-nominal">Nominal (Rp) *</label><input id="us11-nominal" type="number" min="1" step="1000" class="input font-mono font-bold" required placeholder="150000"></div>
+              <div>
+                <label class="lbl" for="us11-ket">Keterangan *</label>
+                <input id="us11-ket" class="input" list="us11-presets" required placeholder="mis. Pembelian karung">
+                <datalist id="us11-presets"><option value="Pembelian karung"></option><option value="Biaya transportasi pengepul"></option><option value="Porsi 10% dari setoran (otomatis)"></option><option value="Konsumsi rapat pengurus"></option></datalist>
+              </div>
+              <div><label class="lbl" for="us11-petugas">Pencatat</label><input class="input bg-slate-100" readonly value="Bendahara (Bendahara) — DUMMY"></div>
+              <div><label class="lbl" for="us11-ref">Referensi Transaksi (opsional)</label><input id="us11-ref" class="input font-mono" placeholder="mis. SET-202611-00042"></div>
+              <div class="flex justify-end gap-2"><button type="reset" class="btn btn-slate">Batal</button><button type="submit" class="btn btn-amber"><i class="fa-solid fa-floppy-disk"></i> Simpan Kas (Simulasi)</button></div>
+            </form>
+          </div>
+          <div class="lg:col-span-3 glass-card p-5 sm:p-6 rounded-3xl">
+            <div class="flex items-center justify-between gap-3 flex-wrap mb-3">
+              <h4 class="font-extrabold text-sm text-slate-800">Buku Kas Operasional (contoh)</h4>
+              <div class="text-right"><p class="text-[9px] font-extrabold text-slate-400 uppercase">Saldo Kas — DUMMY</p><p class="font-mono font-black text-purple-800">Rp 1.650.000</p></div>
+            </div>
+            <div class="overflow-x-auto rounded-2xl border border-slate-200">
+              <table class="tbl">
+                <thead><tr><th>Tanggal</th><th>Tipe</th><th>Keterangan</th><th class="text-right">Nominal</th><th>Ref.</th></tr></thead>
+                <tbody>
+                  <tr><td class="text-slate-500">2026-11-07</td><td><span class="pill pill-ok">Masuk</span></td><td>Porsi 10% setoran 07/11</td><td class="text-right font-mono text-emerald-700">+ 6.875</td><td class="font-mono text-[10px]">SET-202611-00031</td></tr>
+                  <tr><td class="text-slate-500">2026-11-02</td><td><span class="pill pill-red">Keluar</span></td><td>Pembelian 25 karung</td><td class="text-right font-mono text-red-700">− 375.000</td><td class="text-[10px]">—</td></tr>
+                  <tr><td class="text-slate-500">2026-10-28</td><td><span class="pill pill-red">Keluar</span></td><td>Biaya transportasi pengepul</td><td class="text-right font-mono text-red-700">− 150.000</td><td class="text-[10px]">—</td></tr>
+                  <tr><td class="text-slate-500">2026-10-24</td><td><span class="pill pill-ok">Masuk</span></td><td>Porsi 10% setoran 24/10</td><td class="text-right font-mono text-emerald-700">+ 3.000</td><td class="font-mono text-[10px]">SET-202610-00018</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ═══ US-12 · MENGOREKSI TRANSAKSI (pengguna berwenang — Ketua) ═══ -->
+      <section id="view-us12" class="view-pane space-y-5">
+        <div class="glass-card p-5 sm:p-6 rounded-3xl">
+          <div class="flex items-start justify-between gap-3 border-b pb-4 mb-5 flex-wrap">
+            <div>
+              <div class="flex items-center gap-2 flex-wrap"><span class="us-chip">US-12</span><span class="actor-badge actor-ketua">Aktor: Ketua (berwenang)</span><span class="dummy-badge">Data Dummy</span></div>
+              <h3 class="text-lg font-black text-slate-800 mt-2">Koreksi Transaksi</h3>
+              <p class="text-[11px] text-slate-500">Koreksi <strong>tidak menghapus</strong> transaksi lama; perubahan dan alasannya tersimpan di riwayat koreksi (audit log) dan dapat ditelusuri (REQ-18, NFR-09).</p>
+            </div>
+            <div class="w-11 h-11 rounded-2xl bg-purple-50 text-purple-600 flex items-center justify-center text-lg"><i class="fa-solid fa-pen-to-square"></i></div>
+          </div>
+
+          <div class="flex gap-2 max-w-lg mb-4">
+            <input class="input font-mono" placeholder="No. referensi, mis. SET-202611-00031" aria-label="No. referensi transaksi">
+            <button class="btn btn-slate" onclick="alert('SIMULASI MOCKUP — transaksi ditemukan (DATA DUMMY).')"><i class="fa-solid fa-magnifying-glass"></i> Cari</button>
+          </div>
+
+          <form onsubmit="event.preventDefault(); alert('SIMULASI MOCKUP — koreksi tersimpan ke audit log dengan alasan wajib. Data tidak benar-benar tersimpan.')" class="grid grid-cols-1 lg:grid-cols-2 gap-5">
+            <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-2 text-xs">
+              <p class="font-extrabold text-slate-500 uppercase text-[10px]">Transaksi Sebelum Dikoreksi — DUMMY</p>
+              <div class="flex justify-between"><span class="text-slate-500">Referensi</span><span class="font-mono font-bold">SET-202611-00031</span></div>
+              <div class="flex justify-between"><span class="text-slate-500">Nasabah</span><span>Bpk. Nasabah A (BS-000012)</span></div>
+              <div class="flex justify-between"><span class="text-slate-500">Jenis / Berat</span><span>Botol Plastik · <strong>35,5 kg</strong></span></div>
+              <div class="flex justify-between"><span class="text-slate-500">Total Nilai</span><span class="font-mono">Rp 88.750</span></div>
+              <div class="flex justify-between"><span class="text-slate-500">90% Tabungan / 10% Kas</span><span class="font-mono">79.875 / 8.875</span></div>
+            </div>
+            <div class="space-y-3">
+              <p class="font-extrabold text-slate-500 uppercase text-[10px]">Data Sesudah Koreksi</p>
+              <div class="grid grid-cols-2 gap-3">
+                <div><label class="lbl" for="us12-berat">Berat (kg)</label><input id="us12-berat" type="number" step="0.01" class="input font-mono" value="33,5"></div>
+                <div><label class="lbl" for="us12-subtotal">Subtotal Baru (Rp)</label><input id="us12-subtotal" class="input font-mono" value="83.750"></div>
+              </div>
+              <div><label class="lbl" for="us12-alasan">Alasan Koreksi * <span class="normal-case font-medium text-slate-400">(wajib, tersimpan di audit log)</span></label><textarea id="us12-alasan" class="input" rows="2" required placeholder="mis. Salah input berat: aktual 33,5 kg, bukan 35,5 kg"></textarea></div>
+              <label class="flex items-start gap-2 text-[11px] text-slate-600"><input type="checkbox" class="mt-0.5" required> Saya memahami koreksi akan tercatat permanen pada audit log dan tidak menghapus transaksi asli.</label>
+              <div class="flex justify-end"><button type="submit" class="btn btn-primary"><i class="fa-solid fa-check"></i> Simpan Koreksi (Simulasi)</button></div>
+            </div>
+          </form>
+        </div>
+
+        <div class="glass-card p-5 sm:p-6 rounded-3xl">
+          <h4 class="font-extrabold text-sm text-slate-800 mb-3">Riwayat Koreksi / Audit Log (contoh) <span class="dummy-badge">Data Dummy</span></h4>
+          <div class="overflow-x-auto rounded-2xl border border-slate-200">
+            <table class="tbl">
+              <thead><tr><th>Waktu</th><th>Pengguna</th><th>Tabel / Ref.</th><th>Aksi</th><th>Alasan</th></tr></thead>
+              <tbody>
+                <tr><td class="text-slate-500">2026-10-31 09:12</td><td>Ketua Bank Sampah (Ketua)</td><td class="font-mono text-[10px]">transaksi_setor / SET-202610-00018</td><td><span class="pill pill-warn">KOREKSI</span></td><td>Salah input berat kardus: 20,0 → 18,0 kg</td></tr>
+                <tr><td class="text-slate-500">2026-10-25 08:47</td><td>Bendahara (Bendahara)</td><td class="font-mono text-[10px]">kas_operasional / KAS-202610-00009</td><td><span class="pill pill-warn">KOREKSI</span></td><td>Keterangan pengeluaran kurang lengkap</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ═══ US-13 · MELIHAT LAPORAN (Ketua) ═══ -->
+      <section id="view-us13" class="view-pane space-y-5">
+        <div class="glass-card p-5 sm:p-6 rounded-3xl">
+          <div class="flex items-start justify-between gap-3 border-b pb-4 mb-4 flex-wrap">
+            <div>
+              <div class="flex items-center gap-2 flex-wrap"><span class="us-chip">US-13</span><span class="actor-badge actor-ketua">Aktor: Ketua</span><span class="dummy-badge">Data Dummy</span></div>
+              <h3 class="text-lg font-black text-slate-800 mt-2">Laporan Bank Sampah Lestari</h3>
+              <p class="text-[11px] text-slate-500">Setoran, penarikan, saldo nasabah, stok, penyusutan, penjualan, dan kas operasional (REQ-20).</p>
+            </div>
+            <div class="flex items-center gap-2">
+              <input type="month" class="input w-40" value="2026-11" aria-label="Periode laporan">
+              <button class="btn btn-slate" onclick="window.print()"><i class="fa-solid fa-print"></i> Cetak</button>
+            </div>
+          </div>
+          <div class="flex gap-1.5 overflow-x-auto pb-2 -mx-1 px-1" role="tablist" id="report-tabs"></div>
+          <div id="report-panel" class="mt-3"></div>
+        </div>
+      </section>
+
+    </div>
+
+    <!-- Footer -->
+    <footer class="border-t border-slate-200 bg-white/80 px-4 sm:px-6 py-2 text-center text-[10px] text-slate-400">
+      Mockup UI — Tahap 4 Desain Sistem · Bank Sampah Lestari · Seluruh angka/nama adalah <strong>DATA DUMMY</strong> · Bukan aplikasi produksi · ID skenario mengacu SRS (US-01 s.d. US-13)
+    </footer>
+  </main>
+
+
+  <!-- ══════════════════════════════════════════════════════════ -->
+  <!-- JAVASCRIPT (simulasi mockup — TIDAK menyimpan data)        -->
+  <!-- ══════════════════════════════════════════════════════════ -->
+  <script>
+    const metaTitles = {
+      dashboard: { badge: 'Dashboard', title: 'Ringkasan Pengawasan — Ketua' },
+      us03: { badge: 'US-03 · Ketua', title: 'Penetapan Peran Pengurus' },
+      us04: { badge: 'US-04 · Petugas Timbang', title: 'Mencatat Setoran Sampah' },
+      us05: { badge: 'US-05 · Ketua', title: 'Mengatur Harga Sampah' },
+      us06: { badge: 'US-06 · Nasabah', title: 'Memeriksa Saldo dan Riwayat' },
+      us07: { badge: 'US-07 · Bendahara', title: 'Mencatat Penarikan Tabungan' },
+      us08: { badge: 'US-08 · Ketua', title: 'Melihat Stok Sampah' },
+      us09: { badge: 'US-09 · Petugas Timbang', title: 'Penimbangan Ulang & Penyusutan' },
+      us10: { badge: 'US-10 · Pengurus Berwenang', title: 'Mencatat Penjualan kepada Pengepul' },
+      us11: { badge: 'US-11 · Bendahara', title: 'Mencatat Kas Operasional' },
+      us12: { badge: 'US-12 · Ketua (berwenang)', title: 'Mengoreksi Transaksi' },
+      us13: { badge: 'US-13 · Ketua', title: 'Melihat Laporan' }
+    };
+    const rupiah = n => 'Rp ' + Math.round(n).toLocaleString('id-ID');
+
+    function switchTab(tabId) {
+      document.querySelectorAll('.view-pane').forEach(el => el.classList.remove('active'));
+      document.querySelectorAll('.nav-item').forEach(btn => btn.classList.remove('active'));
+      const pane = document.getElementById('view-' + tabId);
+      if (pane) pane.classList.add('active');
+      const btn = document.querySelector('.nav-item[data-tab="' + tabId + '"]');
+      if (btn) btn.classList.add('active');
+      if (metaTitles[tabId]) {
+        document.getElementById('page-badge').textContent = metaTitles[tabId].badge;
+        document.getElementById('page-title').textContent = metaTitles[tabId].title;
+      }
+      if (window.innerWidth < 1024) document.getElementById('sidebar').classList.remove('open');
+      document.querySelector('main').scrollTo({ top: 0 });
+    }
+    function toggleSidebar() { document.getElementById('sidebar').classList.toggle('open'); }
+
+    /* ── Auth overlay (US-01 / US-02) ── */
+    function setAuthTab(tab) {
+      const isLogin = tab === 'login';
+      document.getElementById('form-login').classList.toggle('hidden', !isLogin);
+      document.getElementById('form-register').classList.toggle('hidden', isLogin);
+      document.getElementById('tab-login').className = 'flex-1 py-2.5 rounded-xl text-xs font-extrabold transition ' + (isLogin ? 'bg-emerald-600 text-white shadow' : 'text-slate-500');
+      document.getElementById('tab-register').className = 'flex-1 py-2.5 rounded-xl text-xs font-extrabold transition ' + (!isLogin ? 'bg-emerald-600 text-white shadow' : 'text-slate-500');
+    }
+    function openAuth(tab) { setAuthTab(tab || 'login'); document.getElementById('auth-overlay').classList.remove('hidden'); }
+    function closeAuth() { document.getElementById('auth-overlay').classList.add('hidden'); switchTab('dashboard'); }
+
+    /* ── DATA DUMMY bersama ── */
+    const JENIS = [
+      { nama: 'Botol Plastik',  kat: 'Plastik', harga: 2500, stok: 620.0 },
+      { nama: 'Plastik Campur', kat: 'Plastik', harga: 1000, stok: 180.0 },
+      { nama: 'Kardus',         kat: 'Kertas',  harga: 1500, stok: 480.0 },
+      { nama: 'Kertas',         kat: 'Kertas',  harga: 1200, stok: 270.0 },
+      { nama: 'Besi',           kat: 'Logam',   harga: 5000, stok: 200.0 },
+      { nama: 'Aluminium',      kat: 'Logam',   harga: 8000, stok: 80.0 },
+      { nama: 'Botol Kaca',     kat: 'Kaca',    harga: 800,  stok: 190.0 }
+    ];
+
+    /* ── Dashboard: komposisi stok (DATA DUMMY) ── */
+    (function renderDashBars() {
+      const total = JENIS.reduce((s, j) => s + j.stok, 0);
+      document.getElementById('dash-bars').innerHTML = JENIS.map(j => {
+        const pct = (j.stok / total * 100).toFixed(1);
+        return '<div><div class="flex justify-between font-bold mb-1"><span class="text-slate-700">' + j.nama +
+          '</span><span class="font-mono text-slate-900">' + j.stok.toLocaleString('id-ID', { minimumFractionDigits: 1 }) + ' kg (' + pct + '%)</span></div>' +
+          '<div class="w-full h-2.5 bg-slate-100 rounded-full overflow-hidden"><div class="h-full bg-emerald-500 rounded-full" style="width:' + pct + '%"></div></div></div>';
+      }).join('');
+    })();
+
+    /* ── US-03: daftar akun (DATA DUMMY) ── */
+    const AKUN = [
+      { nama: 'Bpk. Nasabah C', user: 'nasabah_c', rek: 'BS-000031', buku: 'BT-0091', peran: 'Nasabah' },
+      { nama: 'Ibu Nasabah B', user: 'nasabah_b', rek: 'BS-000028', buku: '—', peran: 'Nasabah' },
+      { nama: 'Petugas Timbang 1', user: 'petugas_timbang1', rek: '—', buku: '—', peran: 'Petugas Timbang' },
+      { nama: 'Petugas Timbang 2', user: 'petugas_timbang2', rek: '—', buku: '—', peran: 'Petugas Timbang' },
+      { nama: 'Bendahara', user: 'bendahara', rek: '—', buku: '—', peran: 'Bendahara' }
+    ];
+    (function renderUS03() {
+      const opts = ['Nasabah', 'Ketua', 'Petugas Timbang', 'Bendahara'];
+      document.getElementById('us03-tbody').innerHTML = AKUN.map(a =>
+        '<tr><td class="font-bold">' + a.nama + '</td><td class="font-mono">' + a.user + '</td><td class="font-mono">' + a.rek +
+        '</td><td><input class="input !py-1.5 !text-xs font-mono w-24" value="' + a.buku + '" placeholder="belum dicatat" aria-label="No. buku tabungan"></td><td>' + a.peran + '</td><td><select class="input !py-1.5 !text-xs" aria-label="Tetapkan peran">' +
+        opts.map(o => '<option' + (o === a.peran ? ' selected' : '') + '>' + o + '</option>').join('') +
+        '</select></td><td class="text-center"><button class="btn btn-primary !py-1.5 !px-3 !text-[10px]" onclick="alert(\'SIMULASI MOCKUP — peran akun ' + a.user + ' diperbarui & tercatat di audit log.\')">Tetapkan</button></td></tr>'
+      ).join('');
+    })();
+
+    /* ── US-04: baris setoran dinamis ── */
+    function barisSetoranHTML() {
+      const opts = JENIS.map(j => '<option value="' + j.harga + '">' + j.nama + '</option>').join('');
+      return '<tr><td><select class="input !py-1.5 !text-xs" onchange="hitungSetoran()">' + opts + '</select></td>' +
+        '<td><input type="number" min="0.01" step="0.01" class="input !py-1.5 !text-xs text-right font-mono berat" placeholder="0,00" oninput="hitungSetoran()" required></td>' +
+        '<td class="text-right font-mono harga">0</td><td class="text-right font-mono subtotal">Rp 0</td>' +
+        '<td class="text-center"><button type="button" class="text-red-400 hover:text-red-600" onclick="this.closest(\'tr\').remove(); hitungSetoran();" aria-label="Hapus baris"><i class="fa-solid fa-trash-can"></i></button></td></tr>';
+    }
+    function tambahBarisSetoran() { document.getElementById('us04-rows').insertAdjacentHTML('beforeend', barisSetoranHTML()); hitungSetoran(); }
+    function hitungSetoran() {
+      let total = 0;
+      document.querySelectorAll('#us04-rows tr').forEach(tr => {
+        const harga = parseFloat(tr.querySelector('select').value) || 0;
+        const berat = parseFloat(tr.querySelector('.berat').value) || 0;
+        const sub = harga * berat;
+        tr.querySelector('.harga').textContent = rupiah(harga).replace('Rp ', '');
+        tr.querySelector('.subtotal').textContent = rupiah(sub);
+        total += sub;
+      });
+      document.getElementById('us04-total').textContent = rupiah(total);
+      document.getElementById('us04-tabungan').textContent = rupiah(total * 0.9);
+      document.getElementById('us04-kas').textContent = rupiah(total * 0.1);
+    }
+    function simpanSetoran() {
+      const total = document.getElementById('us04-total').textContent;
+      alert('SIMULASI MOCKUP — Setoran tersimpan.\nTotal: ' + total + '\n90% tabungan & 10% kas tercatat.\nNo. referensi: SET-202611-00042\n(Data tidak benar-benar tersimpan.)');
+    }
+
+    /* ── US-05: tabel harga (DATA DUMMY) ── */
+    (function renderUS05() {
+      document.getElementById('us05-tbody').innerHTML = JENIS.map(j =>
+        '<tr><td class="font-bold">' + j.nama + '</td><td>' + j.kat + '</td><td class="text-right font-mono">' +
+        j.harga.toLocaleString('id-ID') + '</td><td><input type="number" min="1" step="50" class="input !py-1.5 !text-xs text-right font-mono" placeholder="' + j.harga + '" aria-label="Harga baru ' + j.nama + '"></td></tr>'
+      ).join('');
+    })();
+
+    /* ── US-07: preview penarikan ── */
+    function previewPenarikan() {
+      const saldo = parseFloat(document.getElementById('us07-nasabah').value) || 0;
+      const jumlah = parseFloat(document.getElementById('us07-jumlah').value) || 0;
+      document.getElementById('us07-saldo').textContent = rupiah(saldo);
+      document.getElementById('us07-sisa').textContent = rupiah(Math.max(0, saldo - jumlah));
+      document.getElementById('us07-error').classList.toggle('hidden', !(jumlah > saldo || (jumlah < 50000 && jumlah > 0)));
+    }
+    function prosesPenarikan() {
+      const jumlah = parseFloat(document.getElementById('us07-jumlah').value) || 0;
+      alert('SIMULASI MOCKUP — Penarikan ' + rupiah(jumlah) + ' tersimpan.\nNo. referensi: TRK-202611-00007\nSaldo nasabah diperbarui.\n(Data tidak benar-benar tersimpan.)');
+    }
+
+    /* ── US-08: tabel stok (DATA DUMMY) ── */
+    (function renderUS08() {
+      document.getElementById('us08-tbody').innerHTML = JENIS.map(j => {
+        const nilai = j.stok * j.harga;
+        const status = j.stok >= 300 ? '<span class="pill pill-ok">Aman</span>' : j.stok >= 100 ? '<span class="pill pill-warn">Menipis</span>' : '<span class="pill pill-red">Kritis</span>';
+        return '<tr><td class="font-bold">' + j.nama + '</td><td>' + j.kat + '</td><td class="text-right font-mono">' +
+          j.stok.toLocaleString('id-ID', { minimumFractionDigits: 1 }) + '</td><td class="text-right font-mono">' +
+          nilai.toLocaleString('id-ID') + '</td><td class="text-slate-500">2026-11-07 10:15</td><td>' + status + '</td></tr>';
+      }).join('');
+    })();
+
+    /* ── US-09: selisih penimbangan ulang ── */
+    (function renderUS09() {
+      document.getElementById('us09-tbody').innerHTML = JENIS.map(j =>
+        '<tr><td class="font-bold">' + j.nama + '</td><td class="text-right font-mono">' + j.stok.toFixed(1) +
+        '</td><td><input type="number" min="0" step="0.1" class="input !py-1.5 !text-xs text-right font-mono berat-pengepul" value="' + (j.stok * 0.97).toFixed(1) + '" oninput="hitungSelisih(this)"></td>' +
+        '<td class="text-right font-mono selisih">0,0 kg</td><td class="status-selisih"><span class="pill pill-warn">Penyusutan</span></td></tr>'
+      ).join('');
+      document.querySelectorAll('.berat-pengepul').forEach(hitungSelisih);
+    })();
+    function hitungSelisih(input) {
+      const tr = input.closest('tr');
+      const sebelum = parseFloat(tr.children[1].textContent.replace(',', '.')) || 0;
+      const pengepul = parseFloat(input.value) || 0;
+      const selisih = pengepul - sebelum;
+      tr.querySelector('.selisih').textContent = (selisih >= 0 ? '+' : '') + selisih.toFixed(1).replace('.', ',') + ' kg';
+      tr.querySelector('.status-selisih').innerHTML = selisih < 0
+        ? '<span class="pill pill-red">Penyusutan ' + Math.abs(selisih).toFixed(1).replace('.', ',') + ' kg</span>'
+        : '<span class="pill pill-ok">Sesuai / lebih</span>';
+    }
+
+    /* ── US-10: baris penjualan ── */
+    function barisPenjualanHTML() {
+      const opts = JENIS.map(j => '<option value="' + j.stok + '">' + j.nama + ' (stok ' + j.stok.toFixed(1) + ' kg)</option>').join('');
+      return '<tr><td><select class="input !py-1.5 !text-xs" onchange="hitungPenjualan(this)">' + opts + '</select></td>' +
+        '<td class="text-right font-mono stok">0,0</td>' +
+        '<td><input type="number" min="0.1" step="0.1" class="input !py-1.5 !text-xs text-right font-mono jual" placeholder="0,0" oninput="hitungPenjualan(this)" required></td>' +
+        '<td class="text-right font-mono sisa">0,0 kg</td>' +
+        '<td class="text-center"><button type="button" class="text-red-400 hover:text-red-600" onclick="this.closest(\'tr\').remove()" aria-label="Hapus baris"><i class="fa-solid fa-trash-can"></i></button></td></tr>';
+    }
+    function tambahBarisPenjualan() { document.getElementById('us10-rows').insertAdjacentHTML('beforeend', barisPenjualanHTML()); }
+    function hitungPenjualan(el) {
+      const tr = el.closest('tr');
+      const sel = tr.querySelector('select');
+      const stok = parseFloat(sel.value) || 0;
+      const jual = parseFloat(tr.querySelector('.jual').value) || 0;
+      tr.querySelector('.stok').textContent = stok.toFixed(1);
+      const sisa = stok - jual;
+      const sisaEl = tr.querySelector('.sisa');
+      sisaEl.textContent = sisa.toFixed(1).replace('.', ',') + ' kg';
+      sisaEl.className = 'text-right font-mono sisa ' + (sisa < 0 ? 'text-red-600 font-bold' : '');
+    }
+
+    /* ── US-13: tab laporan (DATA DUMMY) ── */
+    const LAPORAN = {
+      'Setoran': { head: ['Tanggal', 'Ref.', 'Nasabah', 'Berat (kg)', 'Total (Rp)', 'Tabungan 90%', 'Kas 10%'],
+        rows: [['2026-11-07', 'SET-202611-00031', 'Bpk. Nasabah A', '35,5', '88.750', '79.875', '8.875'],
+               ['2026-11-07', 'SET-202611-00032', 'Ibu Nasabah B', '12,0', '18.000', '16.200', '1.800'],
+               ['2026-11-07', 'SET-202611-00033', 'Bpk. Nasabah C', '28,0', '56.000', '50.400', '5.600']] },
+      'Penarikan': { head: ['Tanggal', 'Ref.', 'Nasabah', 'Bendahara', 'Jumlah (Rp)', 'Status'],
+        rows: [['2026-10-24', 'TRK-202610-00007', 'Bpk. Nasabah A', 'Bendahara', '100.000', 'Berhasil'],
+               ['2026-10-24', 'TRK-202610-00008', 'Ibu Nasabah B', 'Bendahara', '50.000', 'Berhasil']] },
+      'Saldo Nasabah': { head: ['No. Rekening', 'Nama', 'Saldo (Rp)', 'Setoran Σ', 'Penarikan Σ'],
+        rows: [['BS-000012', 'Bpk. Nasabah A', '306.875', '5', '1'],
+               ['BS-000028', 'Ibu Nasabah B', '120.000', '3', '1'],
+               ['BS-000031', 'Bpk. Nasabah C', '0', '2', '2']] },
+      'Stok': { head: ['Jenis', 'Stok (kg)', 'Estimasi Nilai (Rp)'],
+        rows: JENIS.map(j => [j.nama, j.stok.toFixed(1).replace('.', ','), (j.stok * j.harga).toLocaleString('id-ID')]) },
+      'Penyusutan': { head: ['Tgl Penimbangan', 'Jenis', 'Sebelum (kg)', 'Pengepul (kg)', 'Selisih (kg)'],
+        rows: [['2026-11-14', 'Botol Plastik', '620,0', '601,4', '−18,6'],
+               ['2026-11-14', 'Kardus', '480,0', '470,4', '−9,6'],
+               ['2026-11-14', 'Besi', '200,0', '196,0', '−4,0']] },
+      'Penjualan': { head: ['Tanggal', 'Ref.', 'Jenis', 'Jumlah (kg)', 'Pencatat'],
+        rows: [['2026-11-14', 'JLN-202611-00003', 'Botol Plastik', '300,0', 'Ketua Bank Sampah'],
+               ['2026-11-14', 'JLN-202611-00003', 'Kardus', '250,0', 'Ketua Bank Sampah']] },
+      'Kas Operasional': { head: ['Tanggal', 'Tipe', 'Keterangan', 'Nominal (Rp)'],
+        rows: [['2026-11-07', 'Pemasukan', 'Porsi 10% setoran', '+ 16.275'],
+               ['2026-11-02', 'Pengeluaran', 'Pembelian 25 karung', '− 375.000'],
+               ['2026-10-28', 'Pengeluaran', 'Biaya transportasi pengepul', '− 150.000']] }
+    };
+    let activeReport = 'Setoran';
+    function renderReportTabs() {
+      document.getElementById('report-tabs').innerHTML = Object.keys(LAPORAN).map(k =>
+        '<button role="tab" onclick="activeReport=\'' + k + '\'; renderReport();" class="whitespace-nowrap px-3 py-2 rounded-xl text-[11px] font-extrabold border transition ' +
+        (k === activeReport ? 'bg-emerald-600 text-white border-emerald-600' : 'bg-white text-slate-600 border-slate-200 hover:border-emerald-400') + '">' + k + '</button>'
+      ).join('');
+    }
+    function renderReport() {
+      renderReportTabs();
+      const r = LAPORAN[activeReport];
+      document.getElementById('report-panel').innerHTML =
+        '<div class="overflow-x-auto rounded-2xl border border-slate-200"><table class="tbl"><thead><tr>' +
+        r.head.map(h => '<th>' + h + '</th>').join('') + '</tr></thead><tbody>' +
+        r.rows.map(row => '<tr>' + row.map(c => '<td>' + c + '</td>').join('') + '</tr>').join('') +
+        '</tbody></table></div><p class="text-[10px] text-slate-400 mt-2"><i class="fa-solid fa-flask"></i> Seluruh angka pada laporan ini <strong>DATA DUMMY</strong> untuk keperluan mockup.</p>';
+    }
+
+    /* ── Inisialisasi ── */
+    tambahBarisSetoran(); tambahBarisSetoran();
+    tambahBarisPenjualan(); tambahBarisPenjualan();
+    previewPenarikan();
+    renderReport();
+  </script>
+</body>
+</html>
